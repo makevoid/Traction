@@ -1,5 +1,5 @@
 /*
-	Main config - set layout, model and data parameters for ui components 
+	Main config - set layout, model and data parameters for ui components
 */
 module.exports = {
 
@@ -7,9 +7,9 @@ module.exports = {
 
 	layout: 'SubMission', // EasySlider | SubMission
 
-	model: 'Vesc', // Vesc | Mobipus
+	model: 'vesc', // Vesc | Mobipus
 
-	fps: 30, 
+	fps: 30,
 
  	// available layouts
 
@@ -25,8 +25,8 @@ module.exports = {
 		battery_voltage: {
 			title: 'Battery',
 			units: 'V',
-			min: 12.0,
-			max: 16.8,
+			min: 25.6,
+			max: 34.4,
 			step: 0.5,
 			precision: 1
 		},
@@ -34,25 +34,25 @@ module.exports = {
 		battery_current: {
 			title: 'Current',
 			units: 'A',
-			min: -80,
-			max: 200,
-			step: 20,
+			min: -50,
+			max: 130,
+			step: 10,
 			precision: 0
 		},
 
-        power_kw: {
-        	title: 'Power', 
-            units: 'KW',
-            min: -4.0, 
-            max: 10.0,
-            step: 1.0,
-            precision: 1
-        },
+    power_kw: {
+    	title: 'Power',
+        units: 'KW',
+        min: -4.0,
+        max: 10.0,
+        step: 1.0,
+        precision: 1
+    },
 
 		power_w: {
-        	title: 'Power', 
+        	title: 'Power',
             units: 'W',
-            min: -5000, 
+            min: -5000,
             max: 10000,
             step: 100,
             precision: 0
@@ -62,8 +62,8 @@ module.exports = {
 			title: 'Speed',
 			units: 'KPH',
 			min: 0,
-			max: 260,
-			step: 20,
+			max: 60,
+			step: 10,
 			precision: 0
 		},
 
@@ -71,8 +71,8 @@ module.exports = {
 			title: 'Speed',
 			units: 'MPH',
 			min: 0,
-			max: 160,
-			step: 20,
+			max: 40,
+			step: 5,
 			precision: 0
 		},
 
@@ -80,8 +80,8 @@ module.exports = {
 			title: 'Distance',
 			units: 'KM',
 			min: 0,
-			max: 200,
-			step: 20,
+			max: 30,
+			step: 2,
 			precision: 1
 		},
 
@@ -89,8 +89,8 @@ module.exports = {
 			title: 'Distance',
 			units: 'Miles',
 			min: 0,
-			max: 200,
-			step: 20,
+			max: 20,
+			step: 2,
 			precision: 1
 		},
 
@@ -125,8 +125,8 @@ module.exports = {
 			title: 'Phase',
 			units: 'A',
 			min: 0,
-			max: 200,
-			step: 40,
+			max: 130,
+			step: 20,
 			precision: 0
 		},
 
@@ -191,7 +191,7 @@ module.exports = {
 		wheel_circumference_mm: {
 			title: 'Wheel Circumference',
 			units: 'mm',
-			value: 1250,
+			value: 970,
 			precision: 0
 		}
 	}

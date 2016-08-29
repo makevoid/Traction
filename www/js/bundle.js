@@ -568,17 +568,17 @@
 
 	var _extends = __webpack_require__(8)['default'];
 
-	var _objectWithoutProperties = __webpack_require__(22)['default'];
+	var _objectWithoutProperties = __webpack_require__(24)['default'];
 
-	var _Object$isFrozen = __webpack_require__(23)['default'];
+	var _Object$isFrozen = __webpack_require__(25)['default'];
 
-	var _Object$keys = __webpack_require__(28)['default'];
+	var _Object$keys = __webpack_require__(30)['default'];
 
-	var _interopRequireDefault = __webpack_require__(31)['default'];
+	var _interopRequireDefault = __webpack_require__(33)['default'];
 
 	exports.__esModule = true;
 
-	var _classnames = __webpack_require__(32);
+	var _classnames = __webpack_require__(34);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -590,43 +590,43 @@
 
 	var _reactDom2 = _interopRequireDefault(_reactDom);
 
-	var _utilsDomUtils = __webpack_require__(33);
+	var _utilsDomUtils = __webpack_require__(35);
 
 	var _utilsDomUtils2 = _interopRequireDefault(_utilsDomUtils);
 
-	var _domHelpersUtilScrollbarSize = __webpack_require__(37);
+	var _domHelpersUtilScrollbarSize = __webpack_require__(39);
 
 	var _domHelpersUtilScrollbarSize2 = _interopRequireDefault(_domHelpersUtilScrollbarSize);
 
-	var _utilsEventListener = __webpack_require__(39);
+	var _utilsEventListener = __webpack_require__(41);
 
 	var _utilsEventListener2 = _interopRequireDefault(_utilsEventListener);
 
-	var _utilsCreateChainedFunction = __webpack_require__(40);
+	var _utilsCreateChainedFunction = __webpack_require__(42);
 
 	var _utilsCreateChainedFunction2 = _interopRequireDefault(_utilsCreateChainedFunction);
 
-	var _reactPropTypesLibElementType = __webpack_require__(41);
+	var _reactPropTypesLibElementType = __webpack_require__(43);
 
 	var _reactPropTypesLibElementType2 = _interopRequireDefault(_reactPropTypesLibElementType);
 
-	var _domHelpersUtilInDOM = __webpack_require__(38);
+	var _domHelpersUtilInDOM = __webpack_require__(40);
 
 	var _domHelpersUtilInDOM2 = _interopRequireDefault(_domHelpersUtilInDOM);
 
-	var _domHelpersQueryContains = __webpack_require__(43);
+	var _domHelpersQueryContains = __webpack_require__(45);
 
 	var _domHelpersQueryContains2 = _interopRequireDefault(_domHelpersQueryContains);
 
-	var _domHelpersActiveElement = __webpack_require__(44);
+	var _domHelpersActiveElement = __webpack_require__(46);
 
 	var _domHelpersActiveElement2 = _interopRequireDefault(_domHelpersActiveElement);
 
-	var _reactOverlaysLibPortal = __webpack_require__(45);
+	var _reactOverlaysLibPortal = __webpack_require__(47);
 
 	var _reactOverlaysLibPortal2 = _interopRequireDefault(_reactOverlaysLibPortal);
 
-	var _Fade = __webpack_require__(50);
+	var _Fade = __webpack_require__(52);
 
 	var _Fade2 = _interopRequireDefault(_Fade);
 
@@ -1124,9 +1124,9 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	// 19.1.3.1 Object.assign(target, source)
-	var $def = __webpack_require__(12);
+	var $export = __webpack_require__(12);
 
-	$def($def.S + $def.F, 'Object', {assign: __webpack_require__(15)});
+	$export($export.S + $export.F, 'Object', {assign: __webpack_require__(17)});
 
 /***/ },
 /* 12 */
@@ -1134,51 +1134,50 @@
 
 	var global    = __webpack_require__(13)
 	  , core      = __webpack_require__(14)
+	  , ctx       = __webpack_require__(15)
 	  , PROTOTYPE = 'prototype';
-	var ctx = function(fn, that){
-	  return function(){
-	    return fn.apply(that, arguments);
-	  };
-	};
-	var $def = function(type, name, source){
-	  var key, own, out, exp
-	    , isGlobal = type & $def.G
-	    , isProto  = type & $def.P
-	    , target   = isGlobal ? global : type & $def.S
-	        ? global[name] : (global[name] || {})[PROTOTYPE]
-	    , exports  = isGlobal ? core : core[name] || (core[name] = {});
-	  if(isGlobal)source = name;
+
+	var $export = function(type, name, source){
+	  var IS_FORCED = type & $export.F
+	    , IS_GLOBAL = type & $export.G
+	    , IS_STATIC = type & $export.S
+	    , IS_PROTO  = type & $export.P
+	    , IS_BIND   = type & $export.B
+	    , IS_WRAP   = type & $export.W
+	    , exports   = IS_GLOBAL ? core : core[name] || (core[name] = {})
+	    , target    = IS_GLOBAL ? global : IS_STATIC ? global[name] : (global[name] || {})[PROTOTYPE]
+	    , key, own, out;
+	  if(IS_GLOBAL)source = name;
 	  for(key in source){
 	    // contains in native
-	    own = !(type & $def.F) && target && key in target;
+	    own = !IS_FORCED && target && key in target;
 	    if(own && key in exports)continue;
 	    // export native or passed
 	    out = own ? target[key] : source[key];
 	    // prevent global pollution for namespaces
-	    if(isGlobal && typeof target[key] != 'function')exp = source[key];
+	    exports[key] = IS_GLOBAL && typeof target[key] != 'function' ? source[key]
 	    // bind timers to global for call from export context
-	    else if(type & $def.B && own)exp = ctx(out, global);
+	    : IS_BIND && own ? ctx(out, global)
 	    // wrap global constructors for prevent change them in library
-	    else if(type & $def.W && target[key] == out)!function(C){
-	      exp = function(param){
+	    : IS_WRAP && target[key] == out ? (function(C){
+	      var F = function(param){
 	        return this instanceof C ? new C(param) : C(param);
 	      };
-	      exp[PROTOTYPE] = C[PROTOTYPE];
-	    }(out);
-	    else exp = isProto && typeof out == 'function' ? ctx(Function.call, out) : out;
-	    // export
-	    exports[key] = exp;
-	    if(isProto)(exports[PROTOTYPE] || (exports[PROTOTYPE] = {}))[key] = out;
+	      F[PROTOTYPE] = C[PROTOTYPE];
+	      return F;
+	    // make static versions for prototype methods
+	    })(out) : IS_PROTO && typeof out == 'function' ? ctx(Function.call, out) : out;
+	    if(IS_PROTO)(exports[PROTOTYPE] || (exports[PROTOTYPE] = {}))[key] = out;
 	  }
 	};
 	// type bitmap
-	$def.F = 1;  // forced
-	$def.G = 2;  // global
-	$def.S = 4;  // static
-	$def.P = 8;  // proto
-	$def.B = 16; // bind
-	$def.W = 32; // wrap
-	module.exports = $def;
+	$export.F = 1;  // forced
+	$export.G = 2;  // global
+	$export.S = 4;  // static
+	$export.P = 8;  // proto
+	$export.B = 16; // bind
+	$export.W = 32; // wrap
+	module.exports = $export;
 
 /***/ },
 /* 13 */
@@ -1193,20 +1192,54 @@
 /* 14 */
 /***/ function(module, exports) {
 
-	var core = module.exports = {version: '1.2.3'};
+	var core = module.exports = {version: '1.2.6'};
 	if(typeof __e == 'number')__e = core; // eslint-disable-line no-undef
 
 /***/ },
 /* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
+	// optional / simple context binding
+	var aFunction = __webpack_require__(16);
+	module.exports = function(fn, that, length){
+	  aFunction(fn);
+	  if(that === undefined)return fn;
+	  switch(length){
+	    case 1: return function(a){
+	      return fn.call(that, a);
+	    };
+	    case 2: return function(a, b){
+	      return fn.call(that, a, b);
+	    };
+	    case 3: return function(a, b, c){
+	      return fn.call(that, a, b, c);
+	    };
+	  }
+	  return function(/* ...args */){
+	    return fn.apply(that, arguments);
+	  };
+	};
+
+/***/ },
+/* 16 */
+/***/ function(module, exports) {
+
+	module.exports = function(it){
+	  if(typeof it != 'function')throw TypeError(it + ' is not a function!');
+	  return it;
+	};
+
+/***/ },
+/* 17 */
+/***/ function(module, exports, __webpack_require__) {
+
 	// 19.1.2.1 Object.assign(target, source, ...)
-	var $        = __webpack_require__(16)
-	  , toObject = __webpack_require__(17)
-	  , IObject  = __webpack_require__(19);
+	var $        = __webpack_require__(18)
+	  , toObject = __webpack_require__(19)
+	  , IObject  = __webpack_require__(21);
 
 	// should work with symbols and should have deterministic property order (V8 bug)
-	module.exports = __webpack_require__(21)(function(){
+	module.exports = __webpack_require__(23)(function(){
 	  var a = Object.assign
 	    , A = {}
 	    , B = {}
@@ -1235,7 +1268,7 @@
 	} : Object.assign;
 
 /***/ },
-/* 16 */
+/* 18 */
 /***/ function(module, exports) {
 
 	var $Object = Object;
@@ -1253,17 +1286,17 @@
 	};
 
 /***/ },
-/* 17 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// 7.1.13 ToObject(argument)
-	var defined = __webpack_require__(18);
+	var defined = __webpack_require__(20);
 	module.exports = function(it){
 	  return Object(defined(it));
 	};
 
 /***/ },
-/* 18 */
+/* 20 */
 /***/ function(module, exports) {
 
 	// 7.2.1 RequireObjectCoercible(argument)
@@ -1273,17 +1306,17 @@
 	};
 
 /***/ },
-/* 19 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// fallback for non-array-like ES3 and non-enumerable old V8 strings
-	var cof = __webpack_require__(20);
+	var cof = __webpack_require__(22);
 	module.exports = Object('z').propertyIsEnumerable(0) ? Object : function(it){
 	  return cof(it) == 'String' ? it.split('') : Object(it);
 	};
 
 /***/ },
-/* 20 */
+/* 22 */
 /***/ function(module, exports) {
 
 	var toString = {}.toString;
@@ -1293,7 +1326,7 @@
 	};
 
 /***/ },
-/* 21 */
+/* 23 */
 /***/ function(module, exports) {
 
 	module.exports = function(exec){
@@ -1305,7 +1338,7 @@
 	};
 
 /***/ },
-/* 22 */
+/* 24 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1325,33 +1358,33 @@
 	exports.__esModule = true;
 
 /***/ },
-/* 23 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = { "default": __webpack_require__(24), __esModule: true };
-
-/***/ },
-/* 24 */
-/***/ function(module, exports, __webpack_require__) {
-
-	__webpack_require__(25);
-	module.exports = __webpack_require__(14).Object.isFrozen;
-
-/***/ },
 /* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
-	// 19.1.2.12 Object.isFrozen(O)
-	var isObject = __webpack_require__(26);
+	module.exports = { "default": __webpack_require__(26), __esModule: true };
 
-	__webpack_require__(27)('isFrozen', function($isFrozen){
+/***/ },
+/* 26 */
+/***/ function(module, exports, __webpack_require__) {
+
+	__webpack_require__(27);
+	module.exports = __webpack_require__(14).Object.isFrozen;
+
+/***/ },
+/* 27 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// 19.1.2.12 Object.isFrozen(O)
+	var isObject = __webpack_require__(28);
+
+	__webpack_require__(29)('isFrozen', function($isFrozen){
 	  return function isFrozen(it){
 	    return isObject(it) ? $isFrozen ? $isFrozen(it) : false : true;
 	  };
 	});
 
 /***/ },
-/* 26 */
+/* 28 */
 /***/ function(module, exports) {
 
 	module.exports = function(it){
@@ -1359,46 +1392,48 @@
 	};
 
 /***/ },
-/* 27 */
-/***/ function(module, exports, __webpack_require__) {
-
-	// most Object methods by ES6 should accept primitives
-	module.exports = function(KEY, exec){
-	  var $def = __webpack_require__(12)
-	    , fn   = (__webpack_require__(14).Object || {})[KEY] || Object[KEY]
-	    , exp  = {};
-	  exp[KEY] = exec(fn);
-	  $def($def.S + $def.F * __webpack_require__(21)(function(){ fn(1); }), 'Object', exp);
-	};
-
-/***/ },
-/* 28 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = { "default": __webpack_require__(29), __esModule: true };
-
-/***/ },
 /* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
-	__webpack_require__(30);
-	module.exports = __webpack_require__(14).Object.keys;
+	// most Object methods by ES6 should accept primitives
+	var $export = __webpack_require__(12)
+	  , core    = __webpack_require__(14)
+	  , fails   = __webpack_require__(23);
+	module.exports = function(KEY, exec){
+	  var fn  = (core.Object || {})[KEY] || Object[KEY]
+	    , exp = {};
+	  exp[KEY] = exec(fn);
+	  $export($export.S + $export.F * fails(function(){ fn(1); }), 'Object', exp);
+	};
 
 /***/ },
 /* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
-	// 19.1.2.14 Object.keys(O)
-	var toObject = __webpack_require__(17);
+	module.exports = { "default": __webpack_require__(31), __esModule: true };
 
-	__webpack_require__(27)('keys', function($keys){
+/***/ },
+/* 31 */
+/***/ function(module, exports, __webpack_require__) {
+
+	__webpack_require__(32);
+	module.exports = __webpack_require__(14).Object.keys;
+
+/***/ },
+/* 32 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// 19.1.2.14 Object.keys(O)
+	var toObject = __webpack_require__(19);
+
+	__webpack_require__(29)('keys', function($keys){
 	  return function keys(it){
 	    return $keys(toObject(it));
 	  };
 	});
 
 /***/ },
-/* 31 */
+/* 33 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1412,11 +1447,11 @@
 	exports.__esModule = true;
 
 /***/ },
-/* 32 */
+/* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_RESULT__;/*!
-	  Copyright (c) 2015 Jed Watson.
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
+	  Copyright (c) 2016 Jed Watson.
 	  Licensed under the MIT License (MIT), see
 	  http://jedwatson.github.io/classnames
 	*/
@@ -1428,7 +1463,7 @@
 		var hasOwn = {}.hasOwnProperty;
 
 		function classNames () {
-			var classes = '';
+			var classes = [];
 
 			for (var i = 0; i < arguments.length; i++) {
 				var arg = arguments[i];
@@ -1437,28 +1472,28 @@
 				var argType = typeof arg;
 
 				if (argType === 'string' || argType === 'number') {
-					classes += ' ' + arg;
+					classes.push(arg);
 				} else if (Array.isArray(arg)) {
-					classes += ' ' + classNames.apply(null, arg);
+					classes.push(classNames.apply(null, arg));
 				} else if (argType === 'object') {
 					for (var key in arg) {
 						if (hasOwn.call(arg, key) && arg[key]) {
-							classes += ' ' + key;
+							classes.push(key);
 						}
 					}
 				}
 			}
 
-			return classes.substr(1);
+			return classes.join(' ');
 		}
 
 		if (typeof module !== 'undefined' && module.exports) {
 			module.exports = classNames;
 		} else if (true) {
 			// register as 'classnames', consistent with npm package name
-			!(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
+			!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function () {
 				return classNames;
-			}.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+			}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 		} else {
 			window.classNames = classNames;
 		}
@@ -1466,12 +1501,12 @@
 
 
 /***/ },
-/* 33 */
+/* 35 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var _interopRequireDefault = __webpack_require__(31)['default'];
+	var _interopRequireDefault = __webpack_require__(33)['default'];
 
 	exports.__esModule = true;
 
@@ -1479,11 +1514,11 @@
 
 	var _reactDom2 = _interopRequireDefault(_reactDom);
 
-	var _domHelpersOwnerDocument = __webpack_require__(34);
+	var _domHelpersOwnerDocument = __webpack_require__(36);
 
 	var _domHelpersOwnerDocument2 = _interopRequireDefault(_domHelpersOwnerDocument);
 
-	var _domHelpersOwnerWindow = __webpack_require__(35);
+	var _domHelpersOwnerWindow = __webpack_require__(37);
 
 	var _domHelpersOwnerWindow2 = _interopRequireDefault(_domHelpersOwnerWindow);
 
@@ -1538,7 +1573,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 34 */
+/* 36 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -1553,17 +1588,17 @@
 	module.exports = exports["default"];
 
 /***/ },
-/* 35 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var babelHelpers = __webpack_require__(36);
+	var babelHelpers = __webpack_require__(38);
 
 	exports.__esModule = true;
 	exports['default'] = ownerWindow;
 
-	var _ownerDocument = __webpack_require__(34);
+	var _ownerDocument = __webpack_require__(36);
 
 	var _ownerDocument2 = babelHelpers.interopRequireDefault(_ownerDocument);
 
@@ -1575,7 +1610,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 36 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;(function (root, factory) {
@@ -1611,12 +1646,12 @@
 	})
 
 /***/ },
-/* 37 */
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var canUseDOM = __webpack_require__(38);
+	var canUseDOM = __webpack_require__(40);
 
 	var size;
 
@@ -1641,14 +1676,14 @@
 	};
 
 /***/ },
-/* 38 */
+/* 40 */
 /***/ function(module, exports) {
 
 	'use strict';
 	module.exports = !!(typeof window !== 'undefined' && window.document && window.document.createElement);
 
 /***/ },
-/* 39 */
+/* 41 */
 /***/ function(module, exports) {
 
 	/**
@@ -1711,7 +1746,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 40 */
+/* 42 */
 /***/ function(module, exports) {
 
 	/**
@@ -1757,7 +1792,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 41 */
+/* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1770,7 +1805,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _common = __webpack_require__(42);
+	var _common = __webpack_require__(44);
 
 	/**
 	 * Checks whether a prop provides a type of element.
@@ -1803,7 +1838,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 42 */
+/* 44 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -1842,11 +1877,11 @@
 	}
 
 /***/ },
-/* 43 */
+/* 45 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var canUseDOM = __webpack_require__(38);
+	var canUseDOM = __webpack_require__(40);
 
 	var contains = (function () {
 	  var root = canUseDOM && document.documentElement;
@@ -1867,12 +1902,12 @@
 	module.exports = contains;
 
 /***/ },
-/* 44 */
+/* 46 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var babelHelpers = __webpack_require__(36);
+	var babelHelpers = __webpack_require__(38);
 
 	exports.__esModule = true;
 
@@ -1881,7 +1916,7 @@
 	 */
 	exports['default'] = activeElement;
 
-	var _ownerDocument = __webpack_require__(34);
+	var _ownerDocument = __webpack_require__(36);
 
 	var _ownerDocument2 = babelHelpers.interopRequireDefault(_ownerDocument);
 
@@ -1896,7 +1931,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 45 */
+/* 47 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1913,15 +1948,15 @@
 
 	var _reactDom2 = _interopRequireDefault(_reactDom);
 
-	var _reactPropTypesLibMountable = __webpack_require__(46);
+	var _reactPropTypesLibMountable = __webpack_require__(48);
 
 	var _reactPropTypesLibMountable2 = _interopRequireDefault(_reactPropTypesLibMountable);
 
-	var _utilsOwnerDocument = __webpack_require__(48);
+	var _utilsOwnerDocument = __webpack_require__(50);
 
 	var _utilsOwnerDocument2 = _interopRequireDefault(_utilsOwnerDocument);
 
-	var _utilsGetContainer = __webpack_require__(49);
+	var _utilsGetContainer = __webpack_require__(51);
 
 	var _utilsGetContainer2 = _interopRequireDefault(_utilsGetContainer);
 
@@ -2024,14 +2059,14 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 46 */
+/* 48 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	exports.__esModule = true;
 
-	var _common = __webpack_require__(47);
+	var _common = __webpack_require__(49);
 
 	/**
 	 * Checks whether a prop provides a DOM element
@@ -2056,7 +2091,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 47 */
+/* 49 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2095,7 +2130,7 @@
 	}
 
 /***/ },
-/* 48 */
+/* 50 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2108,7 +2143,7 @@
 
 	var _reactDom2 = _interopRequireDefault(_reactDom);
 
-	var _domHelpersOwnerDocument = __webpack_require__(34);
+	var _domHelpersOwnerDocument = __webpack_require__(36);
 
 	var _domHelpersOwnerDocument2 = _interopRequireDefault(_domHelpersOwnerDocument);
 
@@ -2119,7 +2154,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 49 */
+/* 51 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2141,18 +2176,18 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 50 */
+/* 52 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
-	var _inherits = __webpack_require__(51)['default'];
+	var _inherits = __webpack_require__(53)['default'];
 
 	var _classCallCheck = __webpack_require__(61)['default'];
 
 	var _extends = __webpack_require__(8)['default'];
 
-	var _interopRequireDefault = __webpack_require__(31)['default'];
+	var _interopRequireDefault = __webpack_require__(33)['default'];
 
 	exports.__esModule = true;
 
@@ -2265,14 +2300,14 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 51 */
+/* 53 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 
-	var _Object$create = __webpack_require__(52)["default"];
+	var _Object$create = __webpack_require__(54)["default"];
 
-	var _Object$setPrototypeOf = __webpack_require__(54)["default"];
+	var _Object$setPrototypeOf = __webpack_require__(56)["default"];
 
 	exports["default"] = function (subClass, superClass) {
 	  if (typeof superClass !== "function" && superClass !== null) {
@@ -2293,21 +2328,6 @@
 	exports.__esModule = true;
 
 /***/ },
-/* 52 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = { "default": __webpack_require__(53), __esModule: true };
-
-/***/ },
-/* 53 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var $ = __webpack_require__(16);
-	module.exports = function create(P, D){
-	  return $.create(P, D);
-	};
-
-/***/ },
 /* 54 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -2317,26 +2337,41 @@
 /* 55 */
 /***/ function(module, exports, __webpack_require__) {
 
-	__webpack_require__(56);
-	module.exports = __webpack_require__(14).Object.setPrototypeOf;
+	var $ = __webpack_require__(18);
+	module.exports = function create(P, D){
+	  return $.create(P, D);
+	};
 
 /***/ },
 /* 56 */
 /***/ function(module, exports, __webpack_require__) {
 
-	// 19.1.3.19 Object.setPrototypeOf(O, proto)
-	var $def = __webpack_require__(12);
-	$def($def.S, 'Object', {setPrototypeOf: __webpack_require__(57).set});
+	module.exports = { "default": __webpack_require__(57), __esModule: true };
 
 /***/ },
 /* 57 */
 /***/ function(module, exports, __webpack_require__) {
 
+	__webpack_require__(58);
+	module.exports = __webpack_require__(14).Object.setPrototypeOf;
+
+/***/ },
+/* 58 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// 19.1.3.19 Object.setPrototypeOf(O, proto)
+	var $export = __webpack_require__(12);
+	$export($export.S, 'Object', {setPrototypeOf: __webpack_require__(59).set});
+
+/***/ },
+/* 59 */
+/***/ function(module, exports, __webpack_require__) {
+
 	// Works with __proto__ only. Old v8 can't work with null proto objects.
 	/* eslint-disable no-proto */
-	var getDesc  = __webpack_require__(16).getDesc
-	  , isObject = __webpack_require__(26)
-	  , anObject = __webpack_require__(58);
+	var getDesc  = __webpack_require__(18).getDesc
+	  , isObject = __webpack_require__(28)
+	  , anObject = __webpack_require__(60);
 	var check = function(O, proto){
 	  anObject(O);
 	  if(!isObject(proto) && proto !== null)throw TypeError(proto + ": can't set as prototype!");
@@ -2345,7 +2380,7 @@
 	  set: Object.setPrototypeOf || ('__proto__' in {} ? // eslint-disable-line
 	    function(test, buggy, set){
 	      try {
-	        set = __webpack_require__(59)(Function.call, getDesc(Object.prototype, '__proto__').set, 2);
+	        set = __webpack_require__(15)(Function.call, getDesc(Object.prototype, '__proto__').set, 2);
 	        set(test, []);
 	        buggy = !(test instanceof Array);
 	      } catch(e){ buggy = true; }
@@ -2360,46 +2395,12 @@
 	};
 
 /***/ },
-/* 58 */
+/* 60 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isObject = __webpack_require__(26);
+	var isObject = __webpack_require__(28);
 	module.exports = function(it){
 	  if(!isObject(it))throw TypeError(it + ' is not an object!');
-	  return it;
-	};
-
-/***/ },
-/* 59 */
-/***/ function(module, exports, __webpack_require__) {
-
-	// optional / simple context binding
-	var aFunction = __webpack_require__(60);
-	module.exports = function(fn, that, length){
-	  aFunction(fn);
-	  if(that === undefined)return fn;
-	  switch(length){
-	    case 1: return function(a){
-	      return fn.call(that, a);
-	    };
-	    case 2: return function(a, b){
-	      return fn.call(that, a, b);
-	    };
-	    case 3: return function(a, b, c){
-	      return fn.call(that, a, b, c);
-	    };
-	  }
-	  return function(/* ...args */){
-	    return fn.apply(that, arguments);
-	  };
-	};
-
-/***/ },
-/* 60 */
-/***/ function(module, exports) {
-
-	module.exports = function(it){
-	  if(typeof it != 'function')throw TypeError(it + ' is not a function!');
 	  return it;
 	};
 
@@ -2451,7 +2452,7 @@
 
 	var _domHelpersEventsOn2 = _interopRequireDefault(_domHelpersEventsOn);
 
-	var _classnames = __webpack_require__(32);
+	var _classnames = __webpack_require__(34);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -2764,7 +2765,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var canUseDOM = __webpack_require__(38);
+	var canUseDOM = __webpack_require__(40);
 
 	var has = Object.prototype.hasOwnProperty,
 	    transform = 'transform',
@@ -2824,7 +2825,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var canUseDOM = __webpack_require__(38);
+	var canUseDOM = __webpack_require__(40);
 	var on = function on() {};
 
 	if (canUseDOM) {
@@ -2855,16 +2856,27 @@
 
 	var _warning2 = _interopRequireDefault(_warning);
 
+	var warned = {};
+
 	function deprecated(propType, explanation) {
 	  return function validate(props, propName, componentName) {
 	    if (props[propName] != null) {
-	      _warning2['default'](false, '"' + propName + '" property of "' + componentName + '" has been deprecated.\n' + explanation);
+	      var message = '"' + propName + '" property of "' + componentName + '" has been deprecated.\n' + explanation;
+	      if (!warned[message]) {
+	        _warning2['default'](false, message);
+	        warned[message] = true;
+	      }
 	    }
 
 	    return propType(props, propName, componentName);
 	  };
 	}
 
+	function _resetWarned() {
+	  warned = {};
+	}
+
+	deprecated._resetWarned = _resetWarned;
 	module.exports = exports['default'];
 
 /***/ },
@@ -2939,14 +2951,83 @@
 /***/ function(module, exports) {
 
 	// shim for using process in browser
-
 	var process = module.exports = {};
+
+	// cached from whatever global is present so that test runners that stub it
+	// don't break things.  But we need to wrap it in a try catch in case it is
+	// wrapped in strict mode code which doesn't define any globals.  It's inside a
+	// function because try/catches deoptimize in certain engines.
+
+	var cachedSetTimeout;
+	var cachedClearTimeout;
+
+	(function () {
+	    try {
+	        cachedSetTimeout = setTimeout;
+	    } catch (e) {
+	        cachedSetTimeout = function () {
+	            throw new Error('setTimeout is not defined');
+	        }
+	    }
+	    try {
+	        cachedClearTimeout = clearTimeout;
+	    } catch (e) {
+	        cachedClearTimeout = function () {
+	            throw new Error('clearTimeout is not defined');
+	        }
+	    }
+	} ())
+	function runTimeout(fun) {
+	    if (cachedSetTimeout === setTimeout) {
+	        //normal enviroments in sane situations
+	        return setTimeout(fun, 0);
+	    }
+	    try {
+	        // when when somebody has screwed with setTimeout but no I.E. maddness
+	        return cachedSetTimeout(fun, 0);
+	    } catch(e){
+	        try {
+	            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+	            return cachedSetTimeout.call(null, fun, 0);
+	        } catch(e){
+	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+	            return cachedSetTimeout.call(this, fun, 0);
+	        }
+	    }
+
+
+	}
+	function runClearTimeout(marker) {
+	    if (cachedClearTimeout === clearTimeout) {
+	        //normal enviroments in sane situations
+	        return clearTimeout(marker);
+	    }
+	    try {
+	        // when when somebody has screwed with setTimeout but no I.E. maddness
+	        return cachedClearTimeout(marker);
+	    } catch (e){
+	        try {
+	            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+	            return cachedClearTimeout.call(null, marker);
+	        } catch (e){
+	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+	            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+	            return cachedClearTimeout.call(this, marker);
+	        }
+	    }
+
+
+
+	}
 	var queue = [];
 	var draining = false;
 	var currentQueue;
 	var queueIndex = -1;
 
 	function cleanUpNextTick() {
+	    if (!draining || !currentQueue) {
+	        return;
+	    }
 	    draining = false;
 	    if (currentQueue.length) {
 	        queue = currentQueue.concat(queue);
@@ -2962,7 +3043,7 @@
 	    if (draining) {
 	        return;
 	    }
-	    var timeout = setTimeout(cleanUpNextTick);
+	    var timeout = runTimeout(cleanUpNextTick);
 	    draining = true;
 
 	    var len = queue.length;
@@ -2979,7 +3060,7 @@
 	    }
 	    currentQueue = null;
 	    draining = false;
-	    clearTimeout(timeout);
+	    runClearTimeout(timeout);
 	}
 
 	process.nextTick = function (fun) {
@@ -2991,7 +3072,7 @@
 	    }
 	    queue.push(new Item(fun, args));
 	    if (queue.length === 1 && !draining) {
-	        setTimeout(drainQueue, 0);
+	        runTimeout(drainQueue);
 	    }
 	};
 
@@ -3040,7 +3121,7 @@
 
 	var _extends = __webpack_require__(8)['default'];
 
-	var _interopRequireDefault = __webpack_require__(31)['default'];
+	var _interopRequireDefault = __webpack_require__(33)['default'];
 
 	exports.__esModule = true;
 
@@ -3048,7 +3129,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(32);
+	var _classnames = __webpack_require__(34);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -3123,7 +3204,7 @@
 
 	'use strict';
 
-	var _interopRequireDefault = __webpack_require__(31)['default'];
+	var _interopRequireDefault = __webpack_require__(33)['default'];
 
 	exports.__esModule = true;
 
@@ -3251,7 +3332,7 @@
 	exports.__esModule = true;
 	exports['default'] = keyOf;
 
-	var _common = __webpack_require__(42);
+	var _common = __webpack_require__(44);
 
 	/**
 	 * Checks whether a prop matches a key of an associated object
@@ -3281,13 +3362,13 @@
 
 	'use strict';
 
-	var _inherits = __webpack_require__(51)['default'];
+	var _inherits = __webpack_require__(53)['default'];
 
 	var _classCallCheck = __webpack_require__(61)['default'];
 
 	var _extends = __webpack_require__(8)['default'];
 
-	var _interopRequireDefault = __webpack_require__(31)['default'];
+	var _interopRequireDefault = __webpack_require__(33)['default'];
 
 	exports.__esModule = true;
 
@@ -3295,7 +3376,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(32);
+	var _classnames = __webpack_require__(34);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -3340,13 +3421,13 @@
 
 	'use strict';
 
-	var _inherits = __webpack_require__(51)['default'];
+	var _inherits = __webpack_require__(53)['default'];
 
 	var _classCallCheck = __webpack_require__(61)['default'];
 
 	var _extends = __webpack_require__(8)['default'];
 
-	var _interopRequireDefault = __webpack_require__(31)['default'];
+	var _interopRequireDefault = __webpack_require__(33)['default'];
 
 	exports.__esModule = true;
 
@@ -3354,7 +3435,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(32);
+	var _classnames = __webpack_require__(34);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -3433,13 +3514,13 @@
 
 	'use strict';
 
-	var _inherits = __webpack_require__(51)['default'];
+	var _inherits = __webpack_require__(53)['default'];
 
 	var _classCallCheck = __webpack_require__(61)['default'];
 
 	var _extends = __webpack_require__(8)['default'];
 
-	var _interopRequireDefault = __webpack_require__(31)['default'];
+	var _interopRequireDefault = __webpack_require__(33)['default'];
 
 	exports.__esModule = true;
 
@@ -3447,7 +3528,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(32);
+	var _classnames = __webpack_require__(34);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -3492,13 +3573,13 @@
 
 	'use strict';
 
-	var _inherits = __webpack_require__(51)['default'];
+	var _inherits = __webpack_require__(53)['default'];
 
 	var _classCallCheck = __webpack_require__(61)['default'];
 
 	var _extends = __webpack_require__(8)['default'];
 
-	var _interopRequireDefault = __webpack_require__(31)['default'];
+	var _interopRequireDefault = __webpack_require__(33)['default'];
 
 	exports.__esModule = true;
 
@@ -3506,7 +3587,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(32);
+	var _classnames = __webpack_require__(34);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -3553,7 +3634,7 @@
 
 	var _extends = __webpack_require__(8)['default'];
 
-	var _interopRequireDefault = __webpack_require__(31)['default'];
+	var _interopRequireDefault = __webpack_require__(33)['default'];
 
 	exports.__esModule = true;
 
@@ -3561,7 +3642,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(32);
+	var _classnames = __webpack_require__(34);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -3569,7 +3650,7 @@
 
 	var _BootstrapMixin2 = _interopRequireDefault(_BootstrapMixin);
 
-	var _reactPropTypesLibElementType = __webpack_require__(41);
+	var _reactPropTypesLibElementType = __webpack_require__(43);
 
 	var _reactPropTypesLibElementType2 = _interopRequireDefault(_reactPropTypesLibElementType);
 
@@ -3681,15 +3762,15 @@
 
 	'use strict';
 
-	var _inherits = __webpack_require__(51)['default'];
+	var _inherits = __webpack_require__(53)['default'];
 
 	var _classCallCheck = __webpack_require__(61)['default'];
 
-	var _objectWithoutProperties = __webpack_require__(22)['default'];
+	var _objectWithoutProperties = __webpack_require__(24)['default'];
 
 	var _extends = __webpack_require__(8)['default'];
 
-	var _interopRequireDefault = __webpack_require__(31)['default'];
+	var _interopRequireDefault = __webpack_require__(33)['default'];
 
 	exports.__esModule = true;
 
@@ -3775,11 +3856,11 @@
 
 	'use strict';
 
-	var _inherits = __webpack_require__(51)['default'];
+	var _inherits = __webpack_require__(53)['default'];
 
 	var _classCallCheck = __webpack_require__(61)['default'];
 
-	var _interopRequireDefault = __webpack_require__(31)['default'];
+	var _interopRequireDefault = __webpack_require__(33)['default'];
 
 	exports.__esModule = true;
 
@@ -3787,7 +3868,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(32);
+	var _classnames = __webpack_require__(34);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -3849,17 +3930,17 @@
 
 	'use strict';
 
-	var _inherits = __webpack_require__(51)['default'];
+	var _inherits = __webpack_require__(53)['default'];
 
 	var _classCallCheck = __webpack_require__(61)['default'];
 
 	var _extends = __webpack_require__(8)['default'];
 
-	var _interopRequireDefault = __webpack_require__(31)['default'];
+	var _interopRequireDefault = __webpack_require__(33)['default'];
 
 	exports.__esModule = true;
 
-	var _classnames = __webpack_require__(32);
+	var _classnames = __webpack_require__(34);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -4118,7 +4199,7 @@
 
 	var _extends = __webpack_require__(8)['default'];
 
-	var _interopRequireDefault = __webpack_require__(31)['default'];
+	var _interopRequireDefault = __webpack_require__(33)['default'];
 
 	exports.__esModule = true;
 
@@ -4126,7 +4207,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(32);
+	var _classnames = __webpack_require__(34);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -4179,7 +4260,7 @@
 
 	'use strict';
 
-	var _interopRequireDefault = __webpack_require__(31)['default'];
+	var _interopRequireDefault = __webpack_require__(33)['default'];
 
 	exports.__esModule = true;
 	exports['default'] = valueValidation;
@@ -4227,7 +4308,7 @@
 	    arrOfProps[_key] = arguments[_key];
 	  }
 
-	  function validate(props, propName, componentName) {
+	  function validate(props, propName) {
 	    var usedPropCount = arrOfProps.map(function (listedProp) {
 	      return props[listedProp];
 	    }).reduce(function (acc, curr) {
@@ -4253,13 +4334,13 @@
 
 	'use strict';
 
-	var _inherits = __webpack_require__(51)['default'];
+	var _inherits = __webpack_require__(53)['default'];
 
 	var _classCallCheck = __webpack_require__(61)['default'];
 
 	var _extends = __webpack_require__(8)['default'];
 
-	var _interopRequireDefault = __webpack_require__(31)['default'];
+	var _interopRequireDefault = __webpack_require__(33)['default'];
 
 	exports.__esModule = true;
 
@@ -4271,7 +4352,7 @@
 
 	var _ListGroupItem2 = _interopRequireDefault(_ListGroupItem);
 
-	var _classnames = __webpack_require__(32);
+	var _classnames = __webpack_require__(34);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -4387,7 +4468,7 @@
 
 	var _extends = __webpack_require__(8)['default'];
 
-	var _interopRequireDefault = __webpack_require__(31)['default'];
+	var _interopRequireDefault = __webpack_require__(33)['default'];
 
 	exports.__esModule = true;
 
@@ -4399,7 +4480,7 @@
 
 	var _BootstrapMixin2 = _interopRequireDefault(_BootstrapMixin);
 
-	var _classnames = __webpack_require__(32);
+	var _classnames = __webpack_require__(34);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -4513,7 +4594,7 @@
 
 	'use strict';
 
-	var _interopRequireDefault = __webpack_require__(31)['default'];
+	var _interopRequireDefault = __webpack_require__(33)['default'];
 
 	exports.__esModule = true;
 
@@ -29902,15 +29983,15 @@
 
 	'use strict';
 
-	var _inherits = __webpack_require__(51)['default'];
+	var _inherits = __webpack_require__(53)['default'];
 
 	var _classCallCheck = __webpack_require__(61)['default'];
 
 	var _extends = __webpack_require__(8)['default'];
 
-	var _objectWithoutProperties = __webpack_require__(22)['default'];
+	var _objectWithoutProperties = __webpack_require__(24)['default'];
 
-	var _interopRequireDefault = __webpack_require__(31)['default'];
+	var _interopRequireDefault = __webpack_require__(33)['default'];
 
 	exports.__esModule = true;
 
@@ -29992,25 +30073,25 @@
 
 	'use strict';
 
-	var _inherits = __webpack_require__(51)['default'];
+	var _inherits = __webpack_require__(53)['default'];
 
 	var _classCallCheck = __webpack_require__(61)['default'];
 
 	var _extends = __webpack_require__(8)['default'];
 
-	var _interopRequireDefault = __webpack_require__(31)['default'];
+	var _interopRequireDefault = __webpack_require__(33)['default'];
 
 	exports.__esModule = true;
 
-	var _classnames = __webpack_require__(32);
+	var _classnames = __webpack_require__(34);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
-	var _domHelpersActiveElement = __webpack_require__(44);
+	var _domHelpersActiveElement = __webpack_require__(46);
 
 	var _domHelpersActiveElement2 = _interopRequireDefault(_domHelpersActiveElement);
 
-	var _domHelpersQueryContains = __webpack_require__(43);
+	var _domHelpersQueryContains = __webpack_require__(45);
 
 	var _domHelpersQueryContains2 = _interopRequireDefault(_domHelpersQueryContains);
 
@@ -30038,7 +30119,7 @@
 
 	var _reactPropTypesLibAll2 = _interopRequireDefault(_reactPropTypesLibAll);
 
-	var _reactPropTypesLibElementType = __webpack_require__(41);
+	var _reactPropTypesLibElementType = __webpack_require__(43);
 
 	var _reactPropTypesLibElementType2 = _interopRequireDefault(_reactPropTypesLibElementType);
 
@@ -30062,7 +30143,7 @@
 
 	var _DropdownToggle2 = _interopRequireDefault(_DropdownToggle);
 
-	var _utilsCreateChainedFunction = __webpack_require__(40);
+	var _utilsCreateChainedFunction = __webpack_require__(42);
 
 	var _utilsCreateChainedFunction2 = _interopRequireDefault(_utilsCreateChainedFunction);
 
@@ -30390,8 +30471,6 @@
 	// Source: http://jsfiddle.net/vWx8V/
 	// http://stackoverflow.com/questions/5603195/full-list-of-javascript-keycodes
 
-
-
 	/**
 	 * Conenience method returns corresponding value for given keyName or keyCode.
 	 *
@@ -30455,7 +30534,8 @@
 	  'insert': 45,
 	  'delete': 46,
 	  'command': 91,
-	  'right click': 93,
+	  'left command': 91,
+	  'right command': 93,
 	  'numpad *': 106,
 	  'numpad +': 107,
 	  'numpad -': 109,
@@ -30475,7 +30555,7 @@
 	  '[': 219,
 	  '\\': 220,
 	  ']': 221,
-	  "'": 222,
+	  "'": 222
 	}
 
 	// Helper aliases
@@ -30496,7 +30576,7 @@
 	  'escape': 27,
 	  'spc': 32,
 	  'pgup': 33,
-	  'pgdn': 33,
+	  'pgdn': 34,
 	  'ins': 45,
 	  'del': 46,
 	  'cmd': 91
@@ -33248,12 +33328,14 @@
 
 /***/ },
 /* 368 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	exports.__esModule = true;
 	exports['default'] = all;
+
+	var _common = __webpack_require__(44);
 
 	function all() {
 	  for (var _len = arguments.length, propTypes = Array(_len), _key = 0; _key < _len; _key++) {
@@ -33274,7 +33356,7 @@
 	    throw new Error('No validations provided');
 	  }
 
-	  return function validate(props, propName, componentName) {
+	  function validate(props, propName, componentName) {
 	    for (var i = 0; i < propTypes.length; i++) {
 	      var result = propTypes[i](props, propName, componentName);
 
@@ -33282,7 +33364,9 @@
 	        return result;
 	      }
 	    }
-	  };
+	  }
+
+	  return _common.createChainableTypeChecker(validate);
 	}
 
 	module.exports = exports['default'];
@@ -33316,11 +33400,11 @@
 
 	exports.__esModule = true;
 
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
 	var _createUncontrollable = __webpack_require__(371);
 
 	var _createUncontrollable2 = _interopRequireDefault(_createUncontrollable);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	var mixin = {
 	  shouldComponentUpdate: function shouldComponentUpdate() {
@@ -33337,10 +33421,11 @@
 	  }
 
 	  component._values[propName] = value;
-	  component.forceUpdate();
+
+	  if (component.isMounted()) component.forceUpdate();
 	}
 
-	exports['default'] = _createUncontrollable2['default']([mixin], set);
+	exports.default = (0, _createUncontrollable2.default)([mixin], set);
 	module.exports = exports['default'];
 
 /***/ },
@@ -33353,21 +33438,25 @@
 
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-	exports['default'] = createUncontrollable;
-
-	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-	function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+	exports.default = createUncontrollable;
 
 	var _react = __webpack_require__(1);
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _utils = __webpack_require__(372);
+	var _invariant = __webpack_require__(372);
+
+	var _invariant2 = _interopRequireDefault(_invariant);
+
+	var _utils = __webpack_require__(373);
 
 	var utils = _interopRequireWildcard(_utils);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
 
 	function createUncontrollable(mixins, set) {
 
@@ -33378,10 +33467,12 @@
 
 	    var displayName = Component.displayName || Component.name || 'Component',
 	        basePropTypes = utils.getType(Component).propTypes,
+	        isCompositeComponent = utils.isReactComponent(Component),
 	        propTypes;
 
 	    propTypes = utils.uncontrolledPropTypes(controlledValues, basePropTypes, displayName);
 
+	    (0, _invariant2.default)(isCompositeComponent || !methods.length, '[uncontrollable] stateless function components cannot pass through methods ' + 'becasue they have no associated instances. Check component: ' + displayName + ', ' + 'attempting to pass through methods: ' + methods.join(', '));
 	    methods = utils.transform(methods, function (obj, method) {
 	      obj[method] = function () {
 	        var _refs$inner;
@@ -33390,7 +33481,7 @@
 	      };
 	    }, {});
 
-	    var component = _react2['default'].createClass(_extends({
+	    var component = _react2.default.createClass(_extends({
 
 	      displayName: 'Uncontrolled(' + displayName + ')',
 
@@ -33399,7 +33490,6 @@
 	      propTypes: propTypes
 
 	    }, methods, {
-
 	      componentWillMount: function componentWillMount() {
 	        var props = this.props,
 	            keys = Object.keys(controlledValues);
@@ -33408,6 +33498,7 @@
 	          values[key] = props[utils.defaultKey(key)];
 	        }, {});
 	      },
+
 
 	      /**
 	       * If a prop switches from controlled to Uncontrolled
@@ -33425,7 +33516,6 @@
 	          }
 	        });
 	      },
-
 	      render: function render() {
 	        var _this2 = this;
 
@@ -33449,14 +33539,26 @@
 	          newProps[handle] = setAndNotify.bind(_this2, propName);
 	        });
 
-	        newProps = _extends({}, props, newProps, { ref: 'inner' });
+	        newProps = _extends({}, props, newProps, {
+	          ref: isCompositeComponent ? 'inner' : null
+	        });
 
-	        return _react2['default'].createElement(Component, newProps);
+	        return _react2.default.createElement(Component, newProps);
 	      }
-
 	    }));
 
 	    component.ControlledComponent = Component;
+
+	    /**
+	     * useful when wrapping a Component and you want to control
+	     * everything
+	     */
+	    component.deferControlTo = function (newComponent) {
+	      var additions = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+	      var nextMethods = arguments[2];
+
+	      return uncontrollable(newComponent, _extends({}, controlledValues, additions), nextMethods);
+	    };
 
 	    return component;
 
@@ -33480,16 +33582,74 @@
 	    }
 	  }
 	}
-
 	module.exports = exports['default'];
 
 /***/ },
 /* 372 */
 /***/ function(module, exports, __webpack_require__) {
 
+	/* WEBPACK VAR INJECTION */(function(process) {/**
+	 * Copyright 2013-2015, Facebook, Inc.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 */
+
+	'use strict';
+
+	/**
+	 * Use invariant() to assert state which your program assumes to be true.
+	 *
+	 * Provide sprintf-style format (only %s is supported) and arguments
+	 * to provide information about what broke and what you were
+	 * expecting.
+	 *
+	 * The invariant message will be stripped in production, but the invariant
+	 * will remain to ensure logic does not differ in production.
+	 */
+
+	var invariant = function(condition, format, a, b, c, d, e, f) {
+	  if (process.env.NODE_ENV !== 'production') {
+	    if (format === undefined) {
+	      throw new Error('invariant requires an error message argument');
+	    }
+	  }
+
+	  if (!condition) {
+	    var error;
+	    if (format === undefined) {
+	      error = new Error(
+	        'Minified exception occurred; use the non-minified dev environment ' +
+	        'for the full error message and additional helpful warnings.'
+	      );
+	    } else {
+	      var args = [a, b, c, d, e, f];
+	      var argIndex = 0;
+	      error = new Error(
+	        format.replace(/%s/g, function() { return args[argIndex++]; })
+	      );
+	      error.name = 'Invariant Violation';
+	    }
+
+	    error.framesToPop = 1; // we don't care about invariant's own frame
+	    throw error;
+	  }
+	};
+
+	module.exports = invariant;
+
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(67)))
+
+/***/ },
+/* 373 */
+/***/ function(module, exports, __webpack_require__) {
+
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
 
 	exports.__esModule = true;
+	exports.version = undefined;
 	exports.customPropType = customPropType;
 	exports.uncontrolledPropTypes = uncontrolledPropTypes;
 	exports.getType = getType;
@@ -33499,17 +33659,18 @@
 	exports.chain = chain;
 	exports.transform = transform;
 	exports.each = each;
+	exports.isReactComponent = isReactComponent;
 	exports.has = has;
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 	var _react = __webpack_require__(1);
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _invariant = __webpack_require__(373);
+	var _invariant = __webpack_require__(372);
 
 	var _invariant2 = _interopRequireDefault(_invariant);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function customPropType(handler, propType, name) {
 
@@ -33532,7 +33693,7 @@
 	    transform(controlledValues, function (obj, handler, prop) {
 	      var type = basePropTypes[prop];
 
-	      _invariant2['default'](typeof handler === 'string' && handler.trim().length, 'Uncontrollable - [%s]: the prop `%s` needs a valid handler key name in order to make it uncontrollable', displayName, prop);
+	      (0, _invariant2.default)(typeof handler === 'string' && handler.trim().length, 'Uncontrollable - [%s]: the prop `%s` needs a valid handler key name in order to make it uncontrollable', displayName, prop);
 
 	      obj[prop] = customPropType(handler, type, displayName);
 
@@ -33543,12 +33704,10 @@
 	  return propTypes;
 	}
 
-	var version = _react2['default'].version.split('.').map(parseFloat);
-
-	exports.version = version;
+	var version = exports.version = _react2.default.version.split('.').map(parseFloat);
 
 	function getType(component) {
-	  if (version[0] === 0 && version[1] >= 13) return component;
+	  if (version[0] >= 15 || version[0] === 0 && version[1] >= 13) return component;
 
 	  return component.type;
 	}
@@ -33592,72 +33751,26 @@
 	function each(obj, cb, thisArg) {
 	  if (Array.isArray(obj)) return obj.forEach(cb, thisArg);
 
-	  for (var key in obj) if (has(obj, key)) cb.call(thisArg, obj[key], key, obj);
+	  for (var key in obj) {
+	    if (has(obj, key)) cb.call(thisArg, obj[key], key, obj);
+	  }
 	}
 
-	function has(o, k) {
-	  return o ? Object.prototype.hasOwnProperty.call(o, k) : false;
-	}
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(67)))
-
-/***/ },
-/* 373 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(process) {/**
-	 * Copyright 2013-2015, Facebook, Inc.
+	/**
+	 * Copyright (c) 2013-present, Facebook, Inc.
 	 * All rights reserved.
 	 *
 	 * This source code is licensed under the BSD-style license found in the
 	 * LICENSE file in the root directory of this source tree. An additional grant
 	 * of patent rights can be found in the PATENTS file in the same directory.
-	 *
-	 * @providesModule invariant
 	 */
+	function isReactComponent(component) {
+	  return !!(component && component.prototype && component.prototype.isReactComponent);
+	}
 
-	'use strict';
-
-	/**
-	 * Use invariant() to assert state which your program assumes to be true.
-	 *
-	 * Provide sprintf-style format (only %s is supported) and arguments
-	 * to provide information about what broke and what you were
-	 * expecting.
-	 *
-	 * The invariant message will be stripped in production, but the invariant
-	 * will remain to ensure logic does not differ in production.
-	 */
-
-	var invariant = function(condition, format, a, b, c, d, e, f) {
-	  if (process.env.NODE_ENV !== 'production') {
-	    if (format === undefined) {
-	      throw new Error('invariant requires an error message argument');
-	    }
-	  }
-
-	  if (!condition) {
-	    var error;
-	    if (format === undefined) {
-	      error = new Error(
-	        'Minified exception occurred; use the non-minified dev environment ' +
-	        'for the full error message and additional helpful warnings.'
-	      );
-	    } else {
-	      var args = [a, b, c, d, e, f];
-	      var argIndex = 0;
-	      error = new Error(
-	        'Invariant Violation: ' +
-	        format.replace(/%s/g, function() { return args[argIndex++]; })
-	      );
-	    }
-
-	    error.framesToPop = 1; // we don't care about invariant's own frame
-	    throw error;
-	  }
-	};
-
-	module.exports = invariant;
-
+	function has(o, k) {
+	  return o ? Object.prototype.hasOwnProperty.call(o, k) : false;
+	}
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(67)))
 
 /***/ },
@@ -33668,7 +33781,7 @@
 
 	var _extends = __webpack_require__(8)['default'];
 
-	var _interopRequireDefault = __webpack_require__(31)['default'];
+	var _interopRequireDefault = __webpack_require__(33)['default'];
 
 	exports.__esModule = true;
 
@@ -33676,7 +33789,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(32);
+	var _classnames = __webpack_require__(34);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -33741,19 +33854,19 @@
 
 	'use strict';
 
-	var _inherits = __webpack_require__(51)['default'];
+	var _inherits = __webpack_require__(53)['default'];
 
 	var _classCallCheck = __webpack_require__(61)['default'];
 
-	var _objectWithoutProperties = __webpack_require__(22)['default'];
+	var _objectWithoutProperties = __webpack_require__(24)['default'];
 
 	var _extends = __webpack_require__(8)['default'];
 
-	var _interopRequireDefault = __webpack_require__(31)['default'];
+	var _interopRequireDefault = __webpack_require__(33)['default'];
 
 	exports.__esModule = true;
 
-	var _classnames = __webpack_require__(32);
+	var _classnames = __webpack_require__(34);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -33777,7 +33890,7 @@
 
 	var _utilsValidComponentChildren2 = _interopRequireDefault(_utilsValidComponentChildren);
 
-	var _utilsCreateChainedFunction = __webpack_require__(40);
+	var _utilsCreateChainedFunction = __webpack_require__(42);
 
 	var _utilsCreateChainedFunction2 = _interopRequireDefault(_utilsCreateChainedFunction);
 
@@ -33963,7 +34076,7 @@
 
 	var _utilsCreateChainedFunction2 = _interopRequireDefault(_utilsCreateChainedFunction);
 
-	var _utilsOwnerDocument = __webpack_require__(48);
+	var _utilsOwnerDocument = __webpack_require__(50);
 
 	var _utilsOwnerDocument2 = _interopRequireDefault(_utilsOwnerDocument);
 
@@ -34131,7 +34244,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	var canUseDOM = __webpack_require__(38);
+	var canUseDOM = __webpack_require__(40);
 	var off = function off() {};
 
 	if (canUseDOM) {
@@ -34200,13 +34313,13 @@
 
 	'use strict';
 
-	var _inherits = __webpack_require__(51)['default'];
+	var _inherits = __webpack_require__(53)['default'];
 
 	var _classCallCheck = __webpack_require__(61)['default'];
 
 	var _extends = __webpack_require__(8)['default'];
 
-	var _interopRequireDefault = __webpack_require__(31)['default'];
+	var _interopRequireDefault = __webpack_require__(33)['default'];
 
 	exports.__esModule = true;
 
@@ -34214,7 +34327,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _classnames = __webpack_require__(32);
+	var _classnames = __webpack_require__(34);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -34293,13 +34406,13 @@
 
 	'use strict';
 
-	var _inherits = __webpack_require__(51)['default'];
+	var _inherits = __webpack_require__(53)['default'];
 
 	var _classCallCheck = __webpack_require__(61)['default'];
 
 	var _extends = __webpack_require__(8)['default'];
 
-	var _interopRequireDefault = __webpack_require__(31)['default'];
+	var _interopRequireDefault = __webpack_require__(33)['default'];
 
 	exports.__esModule = true;
 
@@ -34307,7 +34420,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _utilsCreateChainedFunction = __webpack_require__(40);
+	var _utilsCreateChainedFunction = __webpack_require__(42);
 
 	var _utilsCreateChainedFunction2 = _interopRequireDefault(_utilsCreateChainedFunction);
 
@@ -34358,11 +34471,11 @@
 
 	'use strict';
 
-	var _interopRequireDefault = __webpack_require__(31)['default'];
+	var _interopRequireDefault = __webpack_require__(33)['default'];
 
 	exports.__esModule = true;
 
-	var _reactPropTypesLibCommon = __webpack_require__(42);
+	var _reactPropTypesLibCommon = __webpack_require__(44);
 
 	var _childrenToArray = __webpack_require__(383);
 
@@ -34434,7 +34547,7 @@
 
 	'use strict';
 
-	var _interopRequireDefault = __webpack_require__(31)['default'];
+	var _interopRequireDefault = __webpack_require__(33)['default'];
 
 	exports.__esModule = true;
 	exports['default'] = childrenAsArray;
@@ -34465,19 +34578,19 @@
 
 	'use strict';
 
-	var _inherits = __webpack_require__(51)['default'];
+	var _inherits = __webpack_require__(53)['default'];
 
 	var _classCallCheck = __webpack_require__(61)['default'];
 
-	var _objectWithoutProperties = __webpack_require__(22)['default'];
+	var _objectWithoutProperties = __webpack_require__(24)['default'];
 
 	var _extends = __webpack_require__(8)['default'];
 
-	var _interopRequireDefault = __webpack_require__(31)['default'];
+	var _interopRequireDefault = __webpack_require__(33)['default'];
 
 	exports.__esModule = true;
 
-	var _classnames = __webpack_require__(32);
+	var _classnames = __webpack_require__(34);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
 
@@ -34493,7 +34606,7 @@
 
 	var _SafeAnchor2 = _interopRequireDefault(_SafeAnchor);
 
-	var _utilsCreateChainedFunction = __webpack_require__(40);
+	var _utilsCreateChainedFunction = __webpack_require__(42);
 
 	var _utilsCreateChainedFunction2 = _interopRequireDefault(_utilsCreateChainedFunction);
 
@@ -36523,7 +36636,7 @@
 /* 398 */
 /***/ function(module, exports) {
 
-	module.exports = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<!-- Generator: Adobe Illustrator 18.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->\r\n<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\r\n<svg version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0px\" y=\"0px\"\r\n\t viewBox=\"0 0 180 180\" style=\"enable-background:new 0 0 180 180;\" xml:space=\"preserve\">\r\n<g id=\"background\">\r\n\t<rect x=\"0.1\" y=\"-0.3\" width=\"179.9\" height=\"180.3\"/>\r\n</g>\r\n<g id=\"sun-dial\">\r\n\t<g id=\"guides\">\r\n\t</g>\r\n\t<path id=\"border\" style=\"fill:none;stroke:#4D4D4D;stroke-width:3;stroke-miterlimit:10;\" d=\"M20,90c0-38.7,31.3-70,70-70\r\n\t\ts70,31.3,70,70\"/>\r\n\t<g id=\"dial\">\r\n\t\t<defs>\r\n\t\t\t<path id=\"mask\" d=\"M160,90H20c0-38.7,31.3-70,70-70S160,51.3,160,90z\"/>\r\n\t\t</defs>\r\n\t\t<clipPath id=\"mask_1_\">\r\n\t\t\t<use xlink:href=\"#mask\"  style=\"overflow:visible;\"/>\r\n\t\t</clipPath>\r\n\t\t\r\n\t\t\t<radialGradient id=\"sun_1_\" cx=\"780\" cy=\"1760\" r=\"70\" gradientTransform=\"matrix(-1 0 0 -1 870 1850)\" gradientUnits=\"userSpaceOnUse\">\r\n\t\t\t<stop  offset=\"0\" style=\"stop-color:#F88E20\"/>\r\n\t\t\t<stop  offset=\"1\" style=\"stop-color:#F65A30\"/>\r\n\t\t</radialGradient>\r\n\t\t<circle id=\"sun\" style=\"clip-path:url(#mask_1_);fill:url(#sun_1_);\" cx=\"90\" cy=\"90\" r=\"70\"/>\r\n\t</g>\r\n\t<path id=\"clip-path\" d=\"M160,90H20c0-38.7,31.3-70,70-70S160,51.3,160,90z\"/>\r\n\t<text id=\"min\" transform=\"matrix(1 0 0 1 17.5 106.5791)\" style=\"fill:#FFFFFF; font-family:'Calibri'; font-size:18;\">0</text>\r\n\t<text id=\"max\" transform=\"matrix(1 0 0 1 160 106.5791)\" style=\"fill:#FFFFFF; font-family:'Calibri'; font-size:18;\">0</text>\r\n\t<text id=\"value\" transform=\"matrix(1 0 0 1 90 140)\" style=\"fill:#FFFFFF; font-family:'Calibri'; font-size:48;\">0</text>\r\n\t<text id=\"units\" transform=\"matrix(1 0 0 1 90 165)\" style=\"fill:#FFFFFF; font-family:'Calibri'; font-size:21;\">0</text>\r\n</g>\r\n</svg>\r\n"
+	module.exports = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<!-- Generator: Adobe Illustrator 18.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->\n<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\n<svg version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0px\" y=\"0px\"\n\t viewBox=\"0 0 180 180\" style=\"enable-background:new 0 0 180 180;\" xml:space=\"preserve\">\n<g id=\"background\">\n\t<rect x=\"0.1\" y=\"-0.3\" width=\"179.9\" height=\"180.3\"/>\n</g>\n<g id=\"sun-dial\">\n\t<g id=\"guides\">\n\t</g>\n\t<path id=\"border\" style=\"fill:none;stroke:#4D4D4D;stroke-width:3;stroke-miterlimit:10;\" d=\"M20,90c0-38.7,31.3-70,70-70\n\t\ts70,31.3,70,70\"/>\n\t<g id=\"dial\">\n\t\t<defs>\n\t\t\t<path id=\"mask\" d=\"M160,90H20c0-38.7,31.3-70,70-70S160,51.3,160,90z\"/>\n\t\t</defs>\n\t\t<clipPath id=\"mask_1_\">\n\t\t\t<use xlink:href=\"#mask\"  style=\"overflow:visible;\"/>\n\t\t</clipPath>\n\t\t\n\t\t\t<radialGradient id=\"sun_1_\" cx=\"780\" cy=\"1760\" r=\"70\" gradientTransform=\"matrix(-1 0 0 -1 870 1850)\" gradientUnits=\"userSpaceOnUse\">\n\t\t\t<stop  offset=\"0\" style=\"stop-color:#F88E20\"/>\n\t\t\t<stop  offset=\"1\" style=\"stop-color:#F65A30\"/>\n\t\t</radialGradient>\n\t\t<circle id=\"sun\" style=\"clip-path:url(#mask_1_);fill:url(#sun_1_);\" cx=\"90\" cy=\"90\" r=\"70\"/>\n\t</g>\n\t<path id=\"clip-path\" d=\"M160,90H20c0-38.7,31.3-70,70-70S160,51.3,160,90z\"/>\n\t<text id=\"min\" transform=\"matrix(1 0 0 1 17.5 106.5791)\" style=\"fill:#FFFFFF; font-family:'Calibri'; font-size:18;\">0</text>\n\t<text id=\"max\" transform=\"matrix(1 0 0 1 160 106.5791)\" style=\"fill:#FFFFFF; font-family:'Calibri'; font-size:18;\">0</text>\n\t<text id=\"value\" transform=\"matrix(1 0 0 1 90 140)\" style=\"fill:#FFFFFF; font-family:'Calibri'; font-size:48;\">0</text>\n\t<text id=\"units\" transform=\"matrix(1 0 0 1 90 165)\" style=\"fill:#FFFFFF; font-family:'Calibri'; font-size:21;\">0</text>\n</g>\n</svg>\n"
 
 /***/ },
 /* 399 */
@@ -36930,7 +37043,7 @@
 /* 401 */
 /***/ function(module, exports) {
 
-	module.exports = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<!-- Generator: Adobe Illustrator 18.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->\r\n<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\r\n<svg version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0px\" y=\"0px\"\r\n\t viewBox=\"0 0 520 520\" style=\"enable-background:new 0 0 520 520;\" xml:space=\"preserve\">\r\n<g id=\"background\">\r\n\t<rect x=\"0\" y=\"0\" width=\"520\" height=\"520\"/>\r\n</g>\r\n<g id=\"guides\">\r\n\t\r\n\t\t<line id=\"clip-horizon\" style=\"fill:none;stroke:#FF3333;stroke-width:0.5;stroke-miterlimit:10;\" x1=\"-7927\" y1=\"55\" x2=\"8456\" y2=\"55\"/>\r\n\t\r\n\t\t<line id=\"bar-end\" style=\"fill:none;stroke:#FF3333;stroke-width:0.5;stroke-miterlimit:10;\" x1=\"505\" y1=\"-7907\" x2=\"505\" y2=\"8476\"/>\r\n\t\r\n\t\t<line id=\"bar-horizon\" style=\"fill:none;stroke:#FF3333;stroke-width:0.5;stroke-miterlimit:10;\" x1=\"-7927\" y1=\"83\" x2=\"8456\" y2=\"83\"/>\r\n\t\r\n\t\t<line id=\"bar-radius\" style=\"fill:none;stroke:#FF3333;stroke-width:0.5;stroke-miterlimit:10;\" x1=\"46.2\" y1=\"-7907\" x2=\"46.2\" y2=\"8476\"/>\r\n\t\r\n\t\t<line id=\"bar-start\" style=\"fill:none;stroke:#FF3333;stroke-width:0.5;stroke-miterlimit:10;\" x1=\"4369.7\" y1=\"-6857.8\" x2=\"-3821.8\" y2=\"7330.3\"/>\r\n\t<circle id=\"center\" style=\"fill:none;stroke:#FF3333;stroke-width:0.5;stroke-miterlimit:10;\" cx=\"247\" cy=\"283\" r=\"0.5\"/>\r\n\t\r\n\t\t<line id=\"y-axis\" style=\"fill:none;stroke:#FF3333;stroke-width:0.5;stroke-miterlimit:10;\" x1=\"247\" y1=\"-7907\" x2=\"247\" y2=\"8476\"/>\r\n\t\r\n\t\t<line id=\"x-axis\" style=\"fill:none;stroke:#FF3333;stroke-width:0.5;stroke-miterlimit:10;\" x1=\"-7927\" y1=\"283\" x2=\"8456\" y2=\"283\"/>\r\n</g>\r\n<g id=\"scale-line\">\r\n\t<path style=\"fill:none;stroke:#666666;stroke-width:2;stroke-miterlimit:10;\" d=\"M146.1,457.9c-59.3-35-99.9-100-99.9-173.8\r\n\t\tC46.1,173,136,83,247,83h258\"/>\r\n</g>\r\n<g id=\"led-bar\">\r\n\t<g id=\"glow\" style=\"opacity:0.5;\">\r\n\t\t<path id=\"glow-from_1_\" style=\"fill:none;stroke:#0099CC;stroke-miterlimit:10;\" d=\"M145.9,457.8l-0.9-0.5c0,0-0.1,0-0.1-0.1\r\n\t\t\tc-59.2-35-99-99.5-99-173.2c0-111,90-201.1,201.1-201.1h258\"/>\r\n\t\t<path style=\"opacity:0.9808;fill:none;stroke:#009ACD;stroke-miterlimit:10;\" d=\"M145.2,458.9l-0.9-0.5c0,0-0.1,0-0.1-0.1\r\n\t\t\tc-59.6-35.2-99.6-100.1-99.6-174.4c0-111.8,90.6-202.4,202.4-202.4h258\"/>\r\n\t\t<path style=\"opacity:0.9615;fill:none;stroke:#009BCE;stroke-miterlimit:10;\" d=\"M144.6,460.1l-0.9-0.5c0,0-0.1,0-0.1-0.1\r\n\t\t\tC83.5,424,43.2,358.7,43.2,283.9c0-112.6,91.2-203.8,203.8-203.8h258\"/>\r\n\t\t<path style=\"opacity:0.9423;fill:none;stroke:#009CCF;stroke-miterlimit:10;\" d=\"M143.9,461.3l-0.9-0.6c0,0-0.1,0-0.1-0.1\r\n\t\t\tc-60.5-35.7-101-101.5-101-176.8c0-113.3,91.9-205.2,205.2-205.2h258\"/>\r\n\t\t<path style=\"opacity:0.9231;fill:none;stroke:#009DD0;stroke-miterlimit:10;\" d=\"M143.2,462.4l-0.9-0.6c0,0-0.1,0-0.1-0.1\r\n\t\t\tc-60.9-35.9-101.7-102.2-101.7-178c0-114.1,92.5-206.6,206.5-206.6H505\"/>\r\n\t\t<path style=\"opacity:0.9038;fill:none;stroke:#009ED1;stroke-miterlimit:10;\" d=\"M142.6,463.6l-1-0.6c0,0-0.1,0-0.1-0.1\r\n\t\t\tC80.2,426.8,39.2,360.1,39.2,283.8c0-114.8,93.1-207.9,207.9-207.9H505\"/>\r\n\t\t<path style=\"opacity:0.8846;fill:none;stroke:#009FD2;stroke-miterlimit:10;\" d=\"M141.9,464.7l-1-0.6c0,0-0.1,0-0.1-0.1\r\n\t\t\tc-61.7-36.4-103-103.5-103-180.3c0-115.6,93.7-209.3,209.3-209.3H505\"/>\r\n\t\t<path style=\"opacity:0.8654;fill:none;stroke:#00A0D3;stroke-miterlimit:10;\" d=\"M141.3,465.9l-1-0.6c0,0-0.1,0-0.1-0.1\r\n\t\t\tC78.1,428.6,36.5,361,36.5,283.7c0-116.3,94.3-210.7,210.7-210.7H505\"/>\r\n\t\t<path style=\"opacity:0.8462;fill:none;stroke:#00A1D4;stroke-miterlimit:10;\" d=\"M140.6,467.1l-1-0.6c0,0-0.1,0-0.1-0.1\r\n\t\t\tC77,429.5,35.1,361.5,35.1,283.7c0-117.1,94.9-212,212-212H505\"/>\r\n\t\t<path style=\"opacity:0.8269;fill:none;stroke:#00A2D5;stroke-miterlimit:10;\" d=\"M139.9,468.2l-1-0.6c0,0-0.1-0.1-0.1-0.1\r\n\t\t\tc-62.9-37.1-105-105.6-105-183.9c0-117.9,95.5-213.4,213.4-213.4H505\"/>\r\n\t\t<path style=\"opacity:0.8077;fill:none;stroke:#00A3D6;stroke-miterlimit:10;\" d=\"M139.3,469.4l-1-0.6c0,0-0.1-0.1-0.1-0.1\r\n\t\t\tC74.8,431.3,32.4,362.4,32.4,283.6c0-118.6,96.2-214.8,214.8-214.8H505\"/>\r\n\t\t<path style=\"opacity:0.7885;fill:none;stroke:#00A4D7;stroke-miterlimit:10;\" d=\"M138.6,470.5l-1.1-0.6c0,0-0.1-0.1-0.1-0.1\r\n\t\t\tC73.8,432.2,31,362.9,31,283.6c0-119.4,96.8-216.1,216.1-216.1H505\"/>\r\n\t\t<path style=\"opacity:0.7692;fill:none;stroke:#00A5D8;stroke-miterlimit:10;\" d=\"M138,471.7l-1.1-0.6c0,0-0.1-0.1-0.1-0.1\r\n\t\t\tC72.7,433.2,29.7,363.4,29.7,283.6c0-120.1,97.4-217.5,217.5-217.5H505\"/>\r\n\t\t<path style=\"opacity:0.75;fill:none;stroke:#00A6D9;stroke-miterlimit:10;\" d=\"M137.3,472.8l-1.1-0.6c0,0-0.1-0.1-0.1-0.1\r\n\t\t\tC71.6,434.1,28.3,363.9,28.3,283.5c0-120.9,98-218.9,218.9-218.9H505\"/>\r\n\t\t<path style=\"opacity:0.7308;fill:none;stroke:#00A7DA;stroke-miterlimit:10;\" d=\"M136.6,474l-1.1-0.6c0,0-0.1-0.1-0.1-0.1\r\n\t\t\tC70.5,435,27,364.3,27,283.5c0-121.6,98.6-220.3,220.2-220.3H505\"/>\r\n\t\t<path style=\"opacity:0.7115;fill:none;stroke:#00A8DB;stroke-miterlimit:10;\" d=\"M136,475.2l-1.1-0.6c0,0-0.1-0.1-0.1-0.1\r\n\t\t\tc-65.3-38.6-109.1-109.6-109.1-191c0-122.4,99.2-221.6,221.6-221.6H505\"/>\r\n\t\t<path style=\"opacity:0.6923;fill:none;stroke:#00A9DC;stroke-miterlimit:10;\" d=\"M135.3,476.3l-1.1-0.7c0,0-0.1-0.1-0.1-0.1\r\n\t\t\tC68.3,436.8,24.3,365.3,24.3,283.4c0-123.2,99.8-223,223-223H505\"/>\r\n\t\t<path style=\"opacity:0.6731;fill:none;stroke:#00AADD;stroke-miterlimit:10;\" d=\"M134.7,477.5l-1.2-0.7c0,0-0.1-0.1-0.1-0.1\r\n\t\t\tc-66.1-39-110.4-111-110.4-193.3c0-123.9,100.5-224.4,224.4-224.4H505\"/>\r\n\t\t<path style=\"opacity:0.6538;fill:none;stroke:#00ABDE;stroke-miterlimit:10;\" d=\"M134,478.6l-1.2-0.7c0,0-0.1-0.1-0.1-0.1\r\n\t\t\tC66.2,438.6,21.6,366.2,21.6,283.4c0-124.7,101.1-225.7,225.7-225.7H505\"/>\r\n\t\t<path style=\"opacity:0.6346;fill:none;stroke:#00ACDF;stroke-miterlimit:10;\" d=\"M133.3,479.8l-1.2-0.7c0,0-0.1-0.1-0.1-0.1\r\n\t\t\tC65.1,439.5,20.2,366.7,20.2,283.4c0-125.4,101.7-227.1,227.1-227.1H505\"/>\r\n\t\t<path style=\"opacity:0.6154;fill:none;stroke:#00ADE0;stroke-miterlimit:10;\" d=\"M132.7,481l-1.2-0.7c0,0-0.1-0.1-0.1-0.1\r\n\t\t\tC64,440.5,18.9,367.2,18.9,283.3c0-126.2,102.3-228.5,228.5-228.5H505\"/>\r\n\t\t<path style=\"opacity:0.5962;fill:none;stroke:#00AEE1;stroke-miterlimit:10;\" d=\"M132,482.1l-1.2-0.7c0,0-0.1-0.1-0.1-0.1\r\n\t\t\tc-67.7-40-113.2-113.7-113.2-198.1c0-126.9,102.9-229.8,229.8-229.8H505\"/>\r\n\t\t<path style=\"opacity:0.5769;fill:none;stroke:#00AFE2;stroke-miterlimit:10;\" d=\"M131.4,483.3l-1.2-0.7c0,0-0.1-0.1-0.1-0.1\r\n\t\t\tC61.8,442.3,16.1,368.1,16.1,283.3C16.1,155.6,119.7,52,247.4,52H505\"/>\r\n\t\t<path style=\"opacity:0.5577;fill:none;stroke:#00B0E3;stroke-miterlimit:10;\" d=\"M130.7,484.4l-1.3-0.7c0,0-0.1-0.1-0.1-0.1\r\n\t\t\tC60.8,443.2,14.8,368.6,14.8,283.2c0-128.5,104.1-232.6,232.6-232.6H505\"/>\r\n\t\t<path style=\"opacity:0.5385;fill:none;stroke:#00B1E4;stroke-miterlimit:10;\" d=\"M130,485.6l-1.3-0.7c0,0-0.1-0.1-0.1-0.1\r\n\t\t\tC59.7,444.1,13.4,369.1,13.4,283.2c0-129.2,104.7-234,234-234H505\"/>\r\n\t\t<path style=\"opacity:0.5192;fill:none;stroke:#00B2E5;stroke-miterlimit:10;\" d=\"M129.4,486.8l-1.3-0.7c0,0-0.1-0.1-0.1-0.1\r\n\t\t\tC58.6,445,12.1,369.5,12.1,283.2c0-130,105.4-235.3,235.3-235.3H505\"/>\r\n\t\t<path style=\"opacity:0.5;fill:none;stroke:#00B2E5;stroke-miterlimit:10;\" d=\"M128.7,487.9l-1.3-0.7c0,0-0.1-0.1-0.1-0.1\r\n\t\t\tC57.5,445.9,10.7,370,10.7,283.1c0-130.7,106-236.7,236.7-236.7H505\"/>\r\n\t\t<path style=\"opacity:0.4808;fill:none;stroke:#00B3E6;stroke-miterlimit:10;\" d=\"M128.1,489.1l-1.3-0.7c0,0-0.1-0.1-0.1-0.1\r\n\t\t\tC56.4,446.8,9.4,370.5,9.4,283.1C9.4,151.6,116,45,247.4,45H505\"/>\r\n\t\t<path style=\"opacity:0.4615;fill:none;stroke:#00B4E7;stroke-miterlimit:10;\" d=\"M127.4,490.2l-1.3-0.7c0,0-0.1-0.1-0.1-0.1\r\n\t\t\tC55.3,447.8,8,370.9,8,283.1C8,150.8,115.2,43.6,247.5,43.6H505\"/>\r\n\t\t<path style=\"opacity:0.4423;fill:none;stroke:#00B5E8;stroke-miterlimit:10;\" d=\"M126.7,491.4l-1.4-0.8c0,0-0.1-0.1-0.1-0.1\r\n\t\t\tC54.3,448.7,6.7,371.4,6.7,283c0-133,107.8-240.8,240.8-240.8H505\"/>\r\n\t\t<path style=\"opacity:0.4231;fill:none;stroke:#00B6E9;stroke-miterlimit:10;\" d=\"M126.1,492.6l-1.4-0.8c0,0-0.1-0.1-0.2-0.1\r\n\t\t\tC53.2,449.6,5.3,371.9,5.3,283c0-133.8,108.4-242.2,242.2-242.2H505\"/>\r\n\t\t<path style=\"opacity:0.4038;fill:none;stroke:#00B7EA;stroke-miterlimit:10;\" d=\"M125.4,493.7l-1.4-0.8c0,0-0.1-0.1-0.2-0.1\r\n\t\t\tC52.1,450.5,4,372.4,4,283C4,148.5,113,39.4,247.5,39.4H505\"/>\r\n\t\t<path style=\"opacity:0.3846;fill:none;stroke:#00B8EB;stroke-miterlimit:10;\" d=\"M124.8,494.9l-1.4-0.8c0,0-0.1-0.1-0.2-0.1\r\n\t\t\tC51,451.4,2.6,372.8,2.6,283C2.6,147.7,112.3,38,247.5,38H505\"/>\r\n\t\t<path style=\"opacity:0.3654;fill:none;stroke:#00B9EC;stroke-miterlimit:10;\" d=\"M124.1,496l-1.4-0.8c0,0-0.1-0.1-0.2-0.1\r\n\t\t\tC49.9,452.3,1.3,373.3,1.3,282.9c0-136,110.3-246.3,246.3-246.3H505\"/>\r\n\t\t<path style=\"opacity:0.3462;fill:none;stroke:#00BAED;stroke-miterlimit:10;\" d=\"M123.4,497.2l-1.4-0.8c0,0-0.1-0.1-0.2-0.1\r\n\t\t\tC48.9,453.2-0.1,373.8-0.1,282.9c0-136.8,110.9-247.7,247.7-247.7H505\"/>\r\n\t\t<path style=\"opacity:0.3269;fill:none;stroke:#00BBEE;stroke-miterlimit:10;\" d=\"M122.8,498.4l-1.5-0.8c0,0-0.1-0.1-0.2-0.1\r\n\t\t\tC47.8,454.1-1.5,374.3-1.5,282.9c0-137.5,111.5-249,249-249H505\"/>\r\n\t\t<path style=\"opacity:0.3077;fill:none;stroke:#00BCEF;stroke-miterlimit:10;\" d=\"M122.1,499.5l-1.5-0.8c0,0-0.2-0.1-0.2-0.1\r\n\t\t\tC46.7,455.1-2.8,374.7-2.8,282.8c0-138.3,112.1-250.4,250.4-250.4H505\"/>\r\n\t\t<path style=\"opacity:0.2885;fill:none;stroke:#00BDF0;stroke-miterlimit:10;\" d=\"M121.5,500.7l-1.5-0.8c0,0-0.2-0.1-0.2-0.1\r\n\t\t\tc-74.2-43.8-124-124.6-124-217C-4.2,143.7,108.6,31,247.6,31H505\"/>\r\n\t\t<path style=\"opacity:0.2692;fill:none;stroke:#00BEF1;stroke-miterlimit:10;\" d=\"M120.8,501.8l-1.5-0.8c0,0-0.2-0.1-0.2-0.1\r\n\t\t\tC44.5,456.9-5.5,375.7-5.5,282.8C-5.5,143,107.8,29.6,247.6,29.6H505\"/>\r\n\t\t<path style=\"opacity:0.25;fill:none;stroke:#00BFF2;stroke-miterlimit:10;\" d=\"M120.1,503l-1.5-0.8c0,0-0.2-0.1-0.2-0.1\r\n\t\t\tC43.4,457.8-6.9,376.1-6.9,282.7c0-140.6,114-254.5,254.5-254.5H505\"/>\r\n\t\t<path style=\"opacity:0.2308;fill:none;stroke:#00C0F3;stroke-miterlimit:10;\" d=\"M119.5,504.2l-1.5-0.8c0,0-0.2-0.1-0.2-0.1\r\n\t\t\tc-75.4-44.5-126-126.6-126-220.5c0-141.3,114.6-255.9,255.9-255.9H505\"/>\r\n\t\t<path style=\"opacity:0.2115;fill:none;stroke:#00C1F4;stroke-miterlimit:10;\" d=\"M118.8,505.3l-1.6-0.8c0,0-0.2-0.1-0.2-0.1\r\n\t\t\tC41.3,459.6-9.6,377.1-9.6,282.7c0-142.1,115.2-257.3,257.3-257.3H505\"/>\r\n\t\t<path style=\"opacity:0.1923;fill:none;stroke:#00C2F5;stroke-miterlimit:10;\" d=\"M118.2,506.5l-1.6-0.9c0,0-0.2-0.1-0.2-0.1\r\n\t\t\tc-76.2-45-127.3-128-127.3-222.9C-10.9,139.8,104.9,24,247.7,24H505\"/>\r\n\t\t<path style=\"opacity:0.1731;fill:none;stroke:#00C3F6;stroke-miterlimit:10;\" d=\"M117.5,507.6l-1.6-0.9c0,0-0.2-0.1-0.2-0.1\r\n\t\t\tc-76.6-45.2-128-128.6-128-224.1c0-143.6,116.4-260,260-260H505\"/>\r\n\t\t<path style=\"opacity:0.1538;fill:none;stroke:#00C4F7;stroke-miterlimit:10;\" d=\"M116.8,508.8l-1.6-0.9c0,0-0.2-0.1-0.2-0.1\r\n\t\t\tC38,462.4-13.6,378.5-13.6,282.6c0-144.4,117-261.4,261.4-261.4H505\"/>\r\n\t\t<path style=\"opacity:0.1346;fill:none;stroke:#00C5F8;stroke-miterlimit:10;\" d=\"M116.2,509.9l-1.6-0.9c0,0-0.2-0.1-0.2-0.1\r\n\t\t\tC36.9,463.3-15,379-15,282.6c0-145.1,117.6-262.7,262.7-262.7H505\"/>\r\n\t\t<path style=\"opacity:0.1154;fill:none;stroke:#00C6F9;stroke-miterlimit:10;\" d=\"M115.5,511.1l-1.6-0.9c0,0-0.2-0.1-0.2-0.1\r\n\t\t\tc-77.8-45.9-130-130.7-130-227.6c0-145.9,118.2-264.1,264.1-264.1H505\"/>\r\n\t\t<path style=\"opacity:9.615385e-002;fill:none;stroke:#00C7FA;stroke-miterlimit:10;\" d=\"M114.9,512.3l-1.7-0.9\r\n\t\t\tc0,0-0.2-0.1-0.2-0.1C34.8,465.1-17.7,379.9-17.7,282.5C-17.7,135.9,101.2,17,247.8,17H505\"/>\r\n\t\t<path style=\"opacity:7.692308e-002;fill:none;stroke:#00C8FB;stroke-miterlimit:10;\" d=\"M114.2,513.4l-1.7-0.9\r\n\t\t\tc0,0-0.2-0.1-0.2-0.1c-78.6-46.4-131.4-132-131.4-230c0-147.4,119.5-266.9,266.9-266.9H505\"/>\r\n\t\t<path style=\"opacity:5.769231e-002;fill:none;stroke:#00C9FC;stroke-miterlimit:10;\" d=\"M113.5,514.6l-1.7-0.9\r\n\t\t\tc0,0-0.2-0.1-0.2-0.1c-79-46.7-132.1-132.7-132.1-231.1c0-148.1,120.1-268.2,268.2-268.2H505\"/>\r\n\t\t<path style=\"opacity:3.846154e-002;fill:none;stroke:#00CAFD;stroke-miterlimit:10;\" d=\"M112.9,515.7l-1.7-0.9\r\n\t\t\tc0,0-0.2-0.1-0.2-0.1C31.5,467.8-21.8,381.3-21.8,282.4c0-148.9,120.7-269.6,269.6-269.6H505\"/>\r\n\t\t<path style=\"opacity:1.923077e-002;fill:none;stroke:#00CBFE;stroke-miterlimit:10;\" d=\"M112.2,516.9l-1.7-0.9\r\n\t\t\tc0,0-0.2-0.1-0.2-0.1C30.4,468.7-23.1,381.8-23.1,282.4c0-149.6,121.3-271,271-271H505\"/>\r\n\t\t<path id=\"glow-to_1_\" style=\"opacity:0;fill:none;stroke:#00CCFF;stroke-miterlimit:10;\" d=\"M111.6,518.1l-1.9-1\r\n\t\t\tC29.4,469.7-24.5,382.3-24.5,282.3C-24.5,131.9,97.4,10,247.9,10H505\"/>\r\n\t</g>\r\n\t<g id=\"bar_2_\">\r\n\t\t<g>\r\n\t\t\t<path style=\"fill:none;stroke:#0099CC;stroke-width:20;stroke-miterlimit:10;\" d=\"M146,457.7c-59.3-35-100.1-99.9-100.1-173.7\r\n\t\t\t\tc0-111,90-201.1,201.1-201.1h258\"/>\r\n\t\t</g>\r\n\t\t<defs>\r\n\t\t\t<filter id=\"Adobe_OpacityMaskFilter\" filterUnits=\"userSpaceOnUse\" x=\"35.9\" y=\"72.9\" width=\"469.1\" height=\"393.4\">\r\n\t\t\t\t\r\n\t\t\t\t\t<feColorMatrix  type=\"matrix\" values=\"-1 0 0 0 1  0 -1 0 0 1  0 0 -1 0 1  0 0 0 1 0\" color-interpolation-filters=\"sRGB\" result=\"source\"/>\r\n\t\t\t</filter>\r\n\t\t</defs>\r\n\t\t<mask maskUnits=\"userSpaceOnUse\" x=\"35.9\" y=\"72.9\" width=\"469.1\" height=\"393.4\" id=\"SVGID_1_\">\r\n\t\t\t<g style=\"filter:url(#Adobe_OpacityMaskFilter);\">\r\n\t\t\t\t\r\n\t\t\t\t\t<image style=\"overflow:visible;\" width=\"474\" height=\"398\" xlink:href=\"data:image/jpeg;base64,/9j/4AAQSkZJRgABAgEASABIAAD/7AARRHVja3kAAQAEAAAAHgAA/+4AIUFkb2JlAGTAAAAAAQMA\nEAMCAwYAAAXxAAAMMwAAE+T/2wCEABALCwsMCxAMDBAXDw0PFxsUEBAUGx8XFxcXFx8eFxoaGhoX\nHh4jJSclIx4vLzMzLy9AQEBAQEBAQEBAQEBAQEABEQ8PERMRFRISFRQRFBEUGhQWFhQaJhoaHBoa\nJjAjHh4eHiMwKy4nJycuKzU1MDA1NUBAP0BAQEBAQEBAQEBAQP/CABEIAY8B2wMBIgACEQEDEQH/\nxAClAAEAAwEBAQEAAAAAAAAAAAAABAUHBgMCAQEBAAAAAAAAAAAAAAAAAAAAABAAAQQBAwQBBQAC\nAgMAAAAAAwACBAUBFAYWUBI0RBUQIDARE5AxQCMhMyQRAAEDAQMLAwIEAwgDAAAAAAEAAgMRITGT\nUEHRMrLScwQ0hMRRcSIgEhAwYROBYxRAkUJSYnKSMyNUpBIBAAAAAAAAAAAAAAAAAAAAkP/aAAwD\nAQACEQMRAAAA47wRyQjiQjiQjiQjiQjiQjiQjiQj/p7vW3KP77a4M4labJMy9NN+jOv3Rv0zlowz\nlowzlowzlowzlowzlowzlowzlowzlowzlowzlowzlowzlowzlowzjz0uKZb4dTyJEjyI4AAAAAPs\n+PS97A4vquq9yBPg0R1sfOKk1KBl/iaP454O8/OEHduEHduEHduEHduEHduEHduEHduEHduEHduE\nHduEHduEHduEHduEHduEHdeXFC/g11gR48iOAAAAH31RTdveTjy/afjDseV5jxJsP8AAAAAAAAAA\nAAAAAAAAACwr7Ajx5EcAAASfvRCF2H1UE/iaaiJEYAAAAAAAAAAAAAAAAAAAAAFhX2BHjyI4AAmf\nGjnp0jmT9zv4hgAAAAAAAAAAAAAAAAAAAAAACwr7Ajx5EcAffx1pbdl81REzj7gAAAAAAAAAAAAA\nAAAAAAAAAAACwr7Ajx5EcH2WOqUXWEbL7zhj8AAAAAAAAAAAAAAAAAAAAAAAAAsK+wI8eRHHQ0Wm\nl/UXGaFFGAAAAAAAAAAAAAAAAAAAAAAAAABYV9gR48jwLzVOT7M57Lun5IAAAAAAAAAAAAAAAAAA\nAAAAAAAAWFfYEf087o0b6m8ocBC/fwAAAAAAAAAAAAAAAAAAAAAAAAAAWFfYEftuL046HMdHyIqg\nAAAAAAAAAAAAAAAAAAAAAAAAAALCvsD61fMdXImQajlB8gAAAAAAAAAAAAAAAAAAAAAAAAAAWFfY\nFpqWYagcnmmiZ2AAAAAAAAAAAAAAAAAAAAAAAAAAALCvsDoNJzDTjheB0HPgAAAAAAAAAAAAAAAA\nAAAAAAAAAABYV9gWuoZTqhyOdajl5+AAAAAAAAAAAAAAAAAAAAAAAAAAAWFfYHrrGP6mMj2nICCA\nAAAAAAAAAAAAAAAAAAAAAAAAABYV9geGh5305pOUazwJwYAAAAAAAAAAAAAAAAAAAAAAAAAAFhX2\nBHmwvI22r8L4xHyvaIAAAAAAAAAAAAAAAAAAAAAAAAAAWFfYEePIjnWaVimrFJnW1ZQVYAAAAAAA\nAAAAAAAAAAAAAAAAAAFhX2BHjyI47PjJZtfIXFkYh89DzwAAAAAAAAAAAAAAAAAAAAAAAAAsK+wI\n8eRHAOp0vD9FLPLtt4wzp6eYAAAAAAAAAAAAAAAAAAAAAAAAsK+wI8eRHAE6CNet8l004zi9szs5\nZ+/gAAAAAAAAAAAAAAAAAAAAAAAsK+wI8eRHAAHSc3+mzfufaCcJym38QcK9vEAAAAAAAAAAAAAA\nAAAAAAAAWFfYEePIjgAADoeeGyTsi7wj8LrXPGbpkMAAAAAAAAAAAAAAAAAAAAAWFfYEePP8COkC\nOkCOkCOkCPIDqPTlPUi+cgR0gR0gR0gR0gR0gR0gR0gR0gR0gR0gR0gR0gR0gR0gR0gR0gR0gR0g\nR0gR0gR0gR7CPPP/2gAIAQIAAQUA/wAd3//aAAgBAwABBQD/AB3f/9oACAEBAAEFAJ8+did8hPXy\nE9fIT18hPXyE9fIT18hPXyE9fIT18hPXyE9fIT18hPXyE9fIT18hPXyE9fIT18hPXyE9Nl2j0Nt4\nRMr796bS3mcMobt2W7atcrjNouMWi4xaLjFouMWi4xaLjFouMWi4xaLjFouMWi4xaLjFouMWi4xa\nLjFouMWi4xaLjFouMWi4xaLjFouMWi4xaLjFouMWi4xaLjFouMWi4zaJ+3rRuJsOyit1s7R2Hn/8\nDDcuzHqZsjMTaEgmYmyxYxG2tHZgVDHYmVcdqxCj4WI0fCwIOF2BXYFdgV2BXYFdgV2BXYFdgV2B\nXYFdgV2BXYFdgV2BXYFdgV2BXYFdgV2BXYFdgV2BXYFdgV2BXYFZGFSRg7dxtHgXpWHn/mEApnQN\nsSZGa3aARqLRgFhkUA8OMAaJZx2I24I7EbdcdqJvMGMv3oHGM75EudDXOhrnQ1zoa50Nc6GudDXO\nhrnQ1zoa50Nc6GudDXOhrnQ1zoa50Nc6GudDXOhrnQ1zoa50Nc6GudDXOhrnQ1zka5yNZ3yNE3oN\n2LG/bKZ3f/FYef8AkEIhXVu1znzWbZCHEeAEOHHAHEm7jixP3eASmbzK/J9xTy5JPlkWSPdnofpW\nHn/i/wBqto5M11RtcQWgghA0ssIMWG5AgxY7we9SbabIy5znZ6P6Vh5/4RBIZ9JtZxM19OKOwhQg\nbabhEBtnuopcnlHkO6V6Vh5/4IcE8slDtpg8Rogo7J1mKOy73X+syp8iU7pnpWHn/fXVxpxaLbww\nDawUdlreCjsuNxHlPc7Ls9N9Kw8/7q6uLONQUA448/zjjvr8cdllbHnP6f6Vh5/2wYZJZ9vUQwD/\nAGOOO/v2AZY2JZpeoelYef8AYETzE21Q4GxjWRxX98yOOxsSzS9R9Kw8/wCv+1takyR0SMyOK8tW\nRxW1kScfqXpWHn/WjrXTZNPXsAKzmsji3HcPlH6n6Vh5/wBBCcUm16hoREI0At13fbhzsud1P0rD\nz/ptetyc8EDQB3BaNAGfLfKkdU9Kw89AE4xds1mAhllwAO6rPJSdV9Kw89bYg5kSq+PgIdyWGABl\nHdIP1X0rDz8Y/edn13YIzsBBvCx739W9Kw8+qj6iZRRcCBdycCBbScyJvVvSsPP2jE/rJiMwMG75\n/wDIDnZc7q3pWHn7Kh/oZc/zBvOXl5er+lMbl9ntWN2R7MnZH3EfJZ/V/SaP+l5Qi7I+4DdkeeT+\nkvq/pV7e6/q29sfdRe2MTOXP6v6VMzDryDj9R95Gy2P/AL6x6VE3ObyJj9R955/6eselt3GPlQf+\njfD8tF1j0qAucXMbP7j72HhweselSZ/V5Dz+4+88f9HWPSqy5ZfVru6Pu4GHR3Y/Tur+lHJkd9Sk\n7o+5g98aQ3sP1f0jv7LfbRu+Pci/pHuA5FP6v6U/P6sNny8PBLZggN3Rf5Sur+lYefsyb2uHnBAb\n1hZyPq/pWHn7elfwnVR8FBuaFgoJIshP1b0rDzwkyIu1rDBgWAcGBuiDkErq3pWHnraFj/NwCYMD\ndtZgonNy13VfSsPPVbKzGlUM7Bg20TBw30B0SX1X0rDz/ptG1yhOacO6qfBREG4b+qelYef9K2W6\nJJoLFpw2EVpw7nqXRz9U9Kw8/wCu1bdwiQpDTi3BVNkCsYT4cjqfpWHn/UJnhJte8aYecMkC3RQ4\nMwwXhJ1L0rDz/sqrB8GRRXDJApUdkgW5tvf+Xtcx3UfSsPP+3b9w+Iars2SBWERkge4dvuG9zctz\n1D0rDz/txn9Lbt6QBIFgyQOdAHIZfbae1xBvG/p/pWHn/c12W5oNwOE6usRyGSoQ5DNwbYw7MiKa\nM/p3pWHn/fjOcZodwEjPrLgR2GEKQy728MzbCqPDf030rDz/AMNVdnhPqdwjOxxxGZcRQubYiGM3\nTPSsPP8AxRZp4r63c3e2yuGuEcuSk6Z6U+EbM7QmWhMtCZaEy0JloTLQmWhMtCZaEy0Jk2FI/ZIk\n/LNCZaEy0JloTLQmWhMtCZaEy0JloTLQmWhMtCZaEy0JloTLQmWhMtCZaEy0JloTLQmWhMtCZaEy\n0JloTLQmWhMtCZaEy0JloTLQmWhMtCZaEy0JloTLQmWhMtCZaEy0Jloy6P8A/9oACAECAgY/ADu/\n/9oACAEDAgY/ADu//9oACAEBAQY/AOZA5mUASvAAe7/Mf1XUzYjtK6mbEdpXUzYjtK6mbEdpXUzY\njtK6mbEdpXUzYjtK6mbEdpXUzYjtK6mbEdpXUzYjtK6mbEdpXUzYjtK6mbEdpXUzYjtK6mbEdpXU\nzYjtK6mbEdpXUzYjtK6mbEdpXxnnPs9+lD7ZZ7f9btK/75f+b9K6qb/m7ShXmpqf73aV1U+I7Sur\nnxHaV1c+I7SurnxHaV1c+I7SurnxHaV1c+I7SurnxHaV1c+I7SurnxHaV1c+I7SurnxHaV1c+I7S\nurnxHaV1c+I7SurnxHaV1c+I7SurnxHaV1c+I7SurnxHaV1c+I7SurnxHaV1c+I7SurnxHaV1c+I\n7SurnxHaV1c+I7SurnxHaV1c+I7SurnxHaV1U+I7SuqnxHaUXHmprP5jtKr/AFEtf6W/73X/ANVS\nt/ouZ40m0f7DQCp/RD7YyAc5QMlaeiH3Mr7ofAf3LVC1Qrgrgrgrgrgrgrgrgrgrgrgrgrgrgrgr\ngrgrgrgrgrgrgrgrgrgrgrgrgrgrgrgrgrgjcn09Cu28tczxpNo/n/bG0uKBkFB6BAllqHxCuCvC\n1gtYI/Mf3oj7wq/etYq8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8q8\nrWKvKLQb12tf/rXM8aTaP5obG0uJ9EHSg09EPgELAFeAj8gjR4REVSj8qAr5SlVLiT75E7Ty1zPG\nk2j+XQIEtLWFNJbahYBRXgUR+QsRbCSSj90hAOYKrjU/rkjtPLXM8aTaP5QZGKkpskzalD4gUWYU\nR+QFEWwmv6omRxP6ZL7Ty1zPGk2j+SGxtszlNc5tucoWAURtAoiyM1d+iJkcaHNk3tPLXM8aTaP5\nAa0H7a2lNq1elEflSicyJ1G+qJcak3nJ3aeWuZ40m0frDWg/bW0pvxXpRO+SNSQz0yh2nlrmeNJt\nH6mxtFmcpp+1elE75IucT9tbBlHtPLXM8aTaP0iNgqSmuc23OV6UTvki5xP21sGUu08tczxpNo/R\nQJs0jbShZSgTraURNfgDZlPtPLXM8aTaP0NJFWNKbZSgRtpQJ0THfEX5U7Ty1zPGk2j+LY2ipcaJ\nhLbV6UCdGx3yNgRc41Jvyp2nlrmeNJtH8RK4WVsQspQJ1tKBOkcaitmVe08tczxpNo/g2Nt7imWZ\nkc1AjC0335W7Ty1zPGk2j+AkIqAaBCy4J1tLE6Qm82ZW7Ty1zPGk2igBnTHEWm1fwRhabScr9p5a\n5njSbRTGXgGpTbMydbSxSOrUA0GV+08tczxpNor9wjPRD2TxXMi43m3K/aeWuZ40m0U1xF9qPsv2\ngbzljtPLU7RnnftlMszBO9k62oGWO08tStpX/wA79opvsneyld+uWO08tTj+bJtlN9k+noU4m8k5\nY7Ty1zJN4mftFD2T6eirljtPLXNcZ+0UPZPyz2nlrmj/AD5NooeydTLPaeWuabm/eftFD2T65ss9\np5a5rjP2ih7J+We08tcwMxmftFD2T6jMUR6HLHaeWpT6zSbRTfZP9k9vo45Y7Ty1M6tKTv2imeyd\n7KQepqMsdp5a5k+kz9opgrmCPsvvAvNMsdp5a5njSbRX7RNxX8E54Fotyx2nlrmeNJtFNFaBybbm\nT7K2J8ZFKHK/aeWuZ40m0U2Qf4TVMtzI+y/cAsJocr9p5a5njSbR/AQuNoK/gnuAtvRabxZlbtPL\nXM8aTaP4MfmrQptuZOsrUJxAo1xyt2nlrmeNJtH8RE42tsXrUJ5DbcyLHChaaZV7Ty1zPGk2j+LZ\nK0bW1NtrUI2VqEZmNsz5V7Ty1zPGk2j9Ahe665C2tQnfGtQnMcPjWzKnaeWuZ40m0fobIw0LSmtL\nrc69ahOc1vyvBRjeKFuU+08tczxpNo/SHV+BNqb8q1CNlap0sYo4ItdYRYcpdp5a5njSbR+psb3f\nDMhbWoRsrVOlibbnRBFCLxlHtPLXM8aTaP1VCEUrrMxQtrVGytU6WIUKLHijhlDtPLXM8aTaP1gg\n0IuKbFK6hGdC2tUbK1TpI20dmIRZK2n65P7Ty1zPGk2j+RUWFNildZmKHyBqsxqnENtRsJbk7tPL\nXM8aTaP5Qa4ksQ+VVmtTiQEQzJvaeWuZ40m0fyw6N1nog15o70KJrmTnnPk3tPLXMkOitlffNEP8\nR/1rWhx4t9a0OPFvrWhx4t9a0OPFvrWhx4t9a0OPFvrWhx4t9a0OPFvrWhx4t9a0OPFvrWhx4t9f\nF0Vf0mi31SQx/b6maLfWtDjxb61oceLfWtDjxb61oceLfWtDjxb61oceLfWtDjxb61oceLfWtDjx\nb61oceLfWtDjxb61oceLfWtDjxb61oceLfWtDjxb61oceLfWtDjxb61oceLfWtDjxb61oceLfWtD\njxb61oceLfWtDjxb61oceLfWtDjxb61oceLfWtDjxb61oceLfWtDjxb61oceLfWtDjxb61oceLfW\ntDjxb61oceLfWtDjxb61oceLfWtDjxb61oceLfWtDjxb61oceLfWtDjxb61oceLfWtDjxb61oceL\nfWtDjxb6p90XS0/7ov8A2q/51//Z\" transform=\"matrix(1 0 0 1 33.5 70.5)\">\r\n\t\t\t\t</image>\r\n\t\t\t</g>\r\n\t\t</mask>\r\n\t\t<g style=\"opacity:0.85;mask:url(#SVGID_1_);\">\r\n\t\t\t<path style=\"fill:none;stroke:#CCFFFF;stroke-width:20;stroke-miterlimit:10;\" d=\"M146,457.7c-59.3-35-100.1-99.9-100.1-173.7\r\n\t\t\t\tc0-111,90-201.1,201.1-201.1h258\"/>\r\n\t\t</g>\r\n\t</g>\r\n</g>\r\n<g id=\"marker\">\r\n\t<polygon style=\"fill:#CC6600;\" points=\"71,-10 66.5,0 71,10 46,0 \t\"/>\r\n\t\r\n\t\t<text id=\"marker-text\" transform=\"matrix(0 -1.4607 1 0 63 -15.5)\" style=\"fill:#FFFFFF;stroke:#FFFFFF;stroke-miterlimit:10; font-family:'Calibri'; font-size:14;\">123</text>\r\n\t\r\n\t\t<text id=\"marker-text-mirror\" transform=\"matrix(0 1.4607 1 0 63 18.5)\" style=\"display:none;fill:#FFFFFF;stroke:#FFFFFF;stroke-miterlimit:10; font-family:'Calibri'; font-size:14;\">123</text>\r\n</g>\r\n<g id=\"clip-path\">\r\n\t<path id=\"_x3C_Path_x3E__2_\" style=\"fill:none;stroke:#FFFFFF;stroke-width:90;stroke-miterlimit:10;\" d=\"M133,480.5\r\n\t\tC64.9,441.1,19,367.4,19,283C19,157.1,121.1,55,247,55h258\"/>\r\n</g>\r\n<g id=\"clip-path-bi\">\r\n\t<path id=\"neg-path\" style=\"fill:none;stroke:#FFFFFF;stroke-width:90;stroke-miterlimit:10;\" d=\"M19,283\r\n\t\tc0,84.4,45.9,158.1,114,197.5\"/>\r\n\t<path id=\"pos-path\" style=\"fill:none;stroke:#FFFFFF;stroke-width:90;stroke-miterlimit:10;\" d=\"M19,283C19,157.1,121.1,55,247,55\r\n\t\th258\"/>\r\n</g>\r\n</svg>\r\n"
+	module.exports = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<!-- Generator: Adobe Illustrator 18.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->\n<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">\n<svg version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" x=\"0px\" y=\"0px\"\n\t viewBox=\"0 0 520 520\" style=\"enable-background:new 0 0 520 520;\" xml:space=\"preserve\">\n<g id=\"background\">\n\t<rect x=\"0\" y=\"0\" width=\"520\" height=\"520\"/>\n</g>\n<g id=\"guides\">\n\t\n\t\t<line id=\"clip-horizon\" style=\"fill:none;stroke:#FF3333;stroke-width:0.5;stroke-miterlimit:10;\" x1=\"-7927\" y1=\"55\" x2=\"8456\" y2=\"55\"/>\n\t\n\t\t<line id=\"bar-end\" style=\"fill:none;stroke:#FF3333;stroke-width:0.5;stroke-miterlimit:10;\" x1=\"505\" y1=\"-7907\" x2=\"505\" y2=\"8476\"/>\n\t\n\t\t<line id=\"bar-horizon\" style=\"fill:none;stroke:#FF3333;stroke-width:0.5;stroke-miterlimit:10;\" x1=\"-7927\" y1=\"83\" x2=\"8456\" y2=\"83\"/>\n\t\n\t\t<line id=\"bar-radius\" style=\"fill:none;stroke:#FF3333;stroke-width:0.5;stroke-miterlimit:10;\" x1=\"46.2\" y1=\"-7907\" x2=\"46.2\" y2=\"8476\"/>\n\t\n\t\t<line id=\"bar-start\" style=\"fill:none;stroke:#FF3333;stroke-width:0.5;stroke-miterlimit:10;\" x1=\"4369.7\" y1=\"-6857.8\" x2=\"-3821.8\" y2=\"7330.3\"/>\n\t<circle id=\"center\" style=\"fill:none;stroke:#FF3333;stroke-width:0.5;stroke-miterlimit:10;\" cx=\"247\" cy=\"283\" r=\"0.5\"/>\n\t\n\t\t<line id=\"y-axis\" style=\"fill:none;stroke:#FF3333;stroke-width:0.5;stroke-miterlimit:10;\" x1=\"247\" y1=\"-7907\" x2=\"247\" y2=\"8476\"/>\n\t\n\t\t<line id=\"x-axis\" style=\"fill:none;stroke:#FF3333;stroke-width:0.5;stroke-miterlimit:10;\" x1=\"-7927\" y1=\"283\" x2=\"8456\" y2=\"283\"/>\n</g>\n<g id=\"scale-line\">\n\t<path style=\"fill:none;stroke:#666666;stroke-width:2;stroke-miterlimit:10;\" d=\"M146.1,457.9c-59.3-35-99.9-100-99.9-173.8\n\t\tC46.1,173,136,83,247,83h258\"/>\n</g>\n<g id=\"led-bar\">\n\t<g id=\"glow\" style=\"opacity:0.5;\">\n\t\t<path id=\"glow-from_1_\" style=\"fill:none;stroke:#0099CC;stroke-miterlimit:10;\" d=\"M145.9,457.8l-0.9-0.5c0,0-0.1,0-0.1-0.1\n\t\t\tc-59.2-35-99-99.5-99-173.2c0-111,90-201.1,201.1-201.1h258\"/>\n\t\t<path style=\"opacity:0.9808;fill:none;stroke:#009ACD;stroke-miterlimit:10;\" d=\"M145.2,458.9l-0.9-0.5c0,0-0.1,0-0.1-0.1\n\t\t\tc-59.6-35.2-99.6-100.1-99.6-174.4c0-111.8,90.6-202.4,202.4-202.4h258\"/>\n\t\t<path style=\"opacity:0.9615;fill:none;stroke:#009BCE;stroke-miterlimit:10;\" d=\"M144.6,460.1l-0.9-0.5c0,0-0.1,0-0.1-0.1\n\t\t\tC83.5,424,43.2,358.7,43.2,283.9c0-112.6,91.2-203.8,203.8-203.8h258\"/>\n\t\t<path style=\"opacity:0.9423;fill:none;stroke:#009CCF;stroke-miterlimit:10;\" d=\"M143.9,461.3l-0.9-0.6c0,0-0.1,0-0.1-0.1\n\t\t\tc-60.5-35.7-101-101.5-101-176.8c0-113.3,91.9-205.2,205.2-205.2h258\"/>\n\t\t<path style=\"opacity:0.9231;fill:none;stroke:#009DD0;stroke-miterlimit:10;\" d=\"M143.2,462.4l-0.9-0.6c0,0-0.1,0-0.1-0.1\n\t\t\tc-60.9-35.9-101.7-102.2-101.7-178c0-114.1,92.5-206.6,206.5-206.6H505\"/>\n\t\t<path style=\"opacity:0.9038;fill:none;stroke:#009ED1;stroke-miterlimit:10;\" d=\"M142.6,463.6l-1-0.6c0,0-0.1,0-0.1-0.1\n\t\t\tC80.2,426.8,39.2,360.1,39.2,283.8c0-114.8,93.1-207.9,207.9-207.9H505\"/>\n\t\t<path style=\"opacity:0.8846;fill:none;stroke:#009FD2;stroke-miterlimit:10;\" d=\"M141.9,464.7l-1-0.6c0,0-0.1,0-0.1-0.1\n\t\t\tc-61.7-36.4-103-103.5-103-180.3c0-115.6,93.7-209.3,209.3-209.3H505\"/>\n\t\t<path style=\"opacity:0.8654;fill:none;stroke:#00A0D3;stroke-miterlimit:10;\" d=\"M141.3,465.9l-1-0.6c0,0-0.1,0-0.1-0.1\n\t\t\tC78.1,428.6,36.5,361,36.5,283.7c0-116.3,94.3-210.7,210.7-210.7H505\"/>\n\t\t<path style=\"opacity:0.8462;fill:none;stroke:#00A1D4;stroke-miterlimit:10;\" d=\"M140.6,467.1l-1-0.6c0,0-0.1,0-0.1-0.1\n\t\t\tC77,429.5,35.1,361.5,35.1,283.7c0-117.1,94.9-212,212-212H505\"/>\n\t\t<path style=\"opacity:0.8269;fill:none;stroke:#00A2D5;stroke-miterlimit:10;\" d=\"M139.9,468.2l-1-0.6c0,0-0.1-0.1-0.1-0.1\n\t\t\tc-62.9-37.1-105-105.6-105-183.9c0-117.9,95.5-213.4,213.4-213.4H505\"/>\n\t\t<path style=\"opacity:0.8077;fill:none;stroke:#00A3D6;stroke-miterlimit:10;\" d=\"M139.3,469.4l-1-0.6c0,0-0.1-0.1-0.1-0.1\n\t\t\tC74.8,431.3,32.4,362.4,32.4,283.6c0-118.6,96.2-214.8,214.8-214.8H505\"/>\n\t\t<path style=\"opacity:0.7885;fill:none;stroke:#00A4D7;stroke-miterlimit:10;\" d=\"M138.6,470.5l-1.1-0.6c0,0-0.1-0.1-0.1-0.1\n\t\t\tC73.8,432.2,31,362.9,31,283.6c0-119.4,96.8-216.1,216.1-216.1H505\"/>\n\t\t<path style=\"opacity:0.7692;fill:none;stroke:#00A5D8;stroke-miterlimit:10;\" d=\"M138,471.7l-1.1-0.6c0,0-0.1-0.1-0.1-0.1\n\t\t\tC72.7,433.2,29.7,363.4,29.7,283.6c0-120.1,97.4-217.5,217.5-217.5H505\"/>\n\t\t<path style=\"opacity:0.75;fill:none;stroke:#00A6D9;stroke-miterlimit:10;\" d=\"M137.3,472.8l-1.1-0.6c0,0-0.1-0.1-0.1-0.1\n\t\t\tC71.6,434.1,28.3,363.9,28.3,283.5c0-120.9,98-218.9,218.9-218.9H505\"/>\n\t\t<path style=\"opacity:0.7308;fill:none;stroke:#00A7DA;stroke-miterlimit:10;\" d=\"M136.6,474l-1.1-0.6c0,0-0.1-0.1-0.1-0.1\n\t\t\tC70.5,435,27,364.3,27,283.5c0-121.6,98.6-220.3,220.2-220.3H505\"/>\n\t\t<path style=\"opacity:0.7115;fill:none;stroke:#00A8DB;stroke-miterlimit:10;\" d=\"M136,475.2l-1.1-0.6c0,0-0.1-0.1-0.1-0.1\n\t\t\tc-65.3-38.6-109.1-109.6-109.1-191c0-122.4,99.2-221.6,221.6-221.6H505\"/>\n\t\t<path style=\"opacity:0.6923;fill:none;stroke:#00A9DC;stroke-miterlimit:10;\" d=\"M135.3,476.3l-1.1-0.7c0,0-0.1-0.1-0.1-0.1\n\t\t\tC68.3,436.8,24.3,365.3,24.3,283.4c0-123.2,99.8-223,223-223H505\"/>\n\t\t<path style=\"opacity:0.6731;fill:none;stroke:#00AADD;stroke-miterlimit:10;\" d=\"M134.7,477.5l-1.2-0.7c0,0-0.1-0.1-0.1-0.1\n\t\t\tc-66.1-39-110.4-111-110.4-193.3c0-123.9,100.5-224.4,224.4-224.4H505\"/>\n\t\t<path style=\"opacity:0.6538;fill:none;stroke:#00ABDE;stroke-miterlimit:10;\" d=\"M134,478.6l-1.2-0.7c0,0-0.1-0.1-0.1-0.1\n\t\t\tC66.2,438.6,21.6,366.2,21.6,283.4c0-124.7,101.1-225.7,225.7-225.7H505\"/>\n\t\t<path style=\"opacity:0.6346;fill:none;stroke:#00ACDF;stroke-miterlimit:10;\" d=\"M133.3,479.8l-1.2-0.7c0,0-0.1-0.1-0.1-0.1\n\t\t\tC65.1,439.5,20.2,366.7,20.2,283.4c0-125.4,101.7-227.1,227.1-227.1H505\"/>\n\t\t<path style=\"opacity:0.6154;fill:none;stroke:#00ADE0;stroke-miterlimit:10;\" d=\"M132.7,481l-1.2-0.7c0,0-0.1-0.1-0.1-0.1\n\t\t\tC64,440.5,18.9,367.2,18.9,283.3c0-126.2,102.3-228.5,228.5-228.5H505\"/>\n\t\t<path style=\"opacity:0.5962;fill:none;stroke:#00AEE1;stroke-miterlimit:10;\" d=\"M132,482.1l-1.2-0.7c0,0-0.1-0.1-0.1-0.1\n\t\t\tc-67.7-40-113.2-113.7-113.2-198.1c0-126.9,102.9-229.8,229.8-229.8H505\"/>\n\t\t<path style=\"opacity:0.5769;fill:none;stroke:#00AFE2;stroke-miterlimit:10;\" d=\"M131.4,483.3l-1.2-0.7c0,0-0.1-0.1-0.1-0.1\n\t\t\tC61.8,442.3,16.1,368.1,16.1,283.3C16.1,155.6,119.7,52,247.4,52H505\"/>\n\t\t<path style=\"opacity:0.5577;fill:none;stroke:#00B0E3;stroke-miterlimit:10;\" d=\"M130.7,484.4l-1.3-0.7c0,0-0.1-0.1-0.1-0.1\n\t\t\tC60.8,443.2,14.8,368.6,14.8,283.2c0-128.5,104.1-232.6,232.6-232.6H505\"/>\n\t\t<path style=\"opacity:0.5385;fill:none;stroke:#00B1E4;stroke-miterlimit:10;\" d=\"M130,485.6l-1.3-0.7c0,0-0.1-0.1-0.1-0.1\n\t\t\tC59.7,444.1,13.4,369.1,13.4,283.2c0-129.2,104.7-234,234-234H505\"/>\n\t\t<path style=\"opacity:0.5192;fill:none;stroke:#00B2E5;stroke-miterlimit:10;\" d=\"M129.4,486.8l-1.3-0.7c0,0-0.1-0.1-0.1-0.1\n\t\t\tC58.6,445,12.1,369.5,12.1,283.2c0-130,105.4-235.3,235.3-235.3H505\"/>\n\t\t<path style=\"opacity:0.5;fill:none;stroke:#00B2E5;stroke-miterlimit:10;\" d=\"M128.7,487.9l-1.3-0.7c0,0-0.1-0.1-0.1-0.1\n\t\t\tC57.5,445.9,10.7,370,10.7,283.1c0-130.7,106-236.7,236.7-236.7H505\"/>\n\t\t<path style=\"opacity:0.4808;fill:none;stroke:#00B3E6;stroke-miterlimit:10;\" d=\"M128.1,489.1l-1.3-0.7c0,0-0.1-0.1-0.1-0.1\n\t\t\tC56.4,446.8,9.4,370.5,9.4,283.1C9.4,151.6,116,45,247.4,45H505\"/>\n\t\t<path style=\"opacity:0.4615;fill:none;stroke:#00B4E7;stroke-miterlimit:10;\" d=\"M127.4,490.2l-1.3-0.7c0,0-0.1-0.1-0.1-0.1\n\t\t\tC55.3,447.8,8,370.9,8,283.1C8,150.8,115.2,43.6,247.5,43.6H505\"/>\n\t\t<path style=\"opacity:0.4423;fill:none;stroke:#00B5E8;stroke-miterlimit:10;\" d=\"M126.7,491.4l-1.4-0.8c0,0-0.1-0.1-0.1-0.1\n\t\t\tC54.3,448.7,6.7,371.4,6.7,283c0-133,107.8-240.8,240.8-240.8H505\"/>\n\t\t<path style=\"opacity:0.4231;fill:none;stroke:#00B6E9;stroke-miterlimit:10;\" d=\"M126.1,492.6l-1.4-0.8c0,0-0.1-0.1-0.2-0.1\n\t\t\tC53.2,449.6,5.3,371.9,5.3,283c0-133.8,108.4-242.2,242.2-242.2H505\"/>\n\t\t<path style=\"opacity:0.4038;fill:none;stroke:#00B7EA;stroke-miterlimit:10;\" d=\"M125.4,493.7l-1.4-0.8c0,0-0.1-0.1-0.2-0.1\n\t\t\tC52.1,450.5,4,372.4,4,283C4,148.5,113,39.4,247.5,39.4H505\"/>\n\t\t<path style=\"opacity:0.3846;fill:none;stroke:#00B8EB;stroke-miterlimit:10;\" d=\"M124.8,494.9l-1.4-0.8c0,0-0.1-0.1-0.2-0.1\n\t\t\tC51,451.4,2.6,372.8,2.6,283C2.6,147.7,112.3,38,247.5,38H505\"/>\n\t\t<path style=\"opacity:0.3654;fill:none;stroke:#00B9EC;stroke-miterlimit:10;\" d=\"M124.1,496l-1.4-0.8c0,0-0.1-0.1-0.2-0.1\n\t\t\tC49.9,452.3,1.3,373.3,1.3,282.9c0-136,110.3-246.3,246.3-246.3H505\"/>\n\t\t<path style=\"opacity:0.3462;fill:none;stroke:#00BAED;stroke-miterlimit:10;\" d=\"M123.4,497.2l-1.4-0.8c0,0-0.1-0.1-0.2-0.1\n\t\t\tC48.9,453.2-0.1,373.8-0.1,282.9c0-136.8,110.9-247.7,247.7-247.7H505\"/>\n\t\t<path style=\"opacity:0.3269;fill:none;stroke:#00BBEE;stroke-miterlimit:10;\" d=\"M122.8,498.4l-1.5-0.8c0,0-0.1-0.1-0.2-0.1\n\t\t\tC47.8,454.1-1.5,374.3-1.5,282.9c0-137.5,111.5-249,249-249H505\"/>\n\t\t<path style=\"opacity:0.3077;fill:none;stroke:#00BCEF;stroke-miterlimit:10;\" d=\"M122.1,499.5l-1.5-0.8c0,0-0.2-0.1-0.2-0.1\n\t\t\tC46.7,455.1-2.8,374.7-2.8,282.8c0-138.3,112.1-250.4,250.4-250.4H505\"/>\n\t\t<path style=\"opacity:0.2885;fill:none;stroke:#00BDF0;stroke-miterlimit:10;\" d=\"M121.5,500.7l-1.5-0.8c0,0-0.2-0.1-0.2-0.1\n\t\t\tc-74.2-43.8-124-124.6-124-217C-4.2,143.7,108.6,31,247.6,31H505\"/>\n\t\t<path style=\"opacity:0.2692;fill:none;stroke:#00BEF1;stroke-miterlimit:10;\" d=\"M120.8,501.8l-1.5-0.8c0,0-0.2-0.1-0.2-0.1\n\t\t\tC44.5,456.9-5.5,375.7-5.5,282.8C-5.5,143,107.8,29.6,247.6,29.6H505\"/>\n\t\t<path style=\"opacity:0.25;fill:none;stroke:#00BFF2;stroke-miterlimit:10;\" d=\"M120.1,503l-1.5-0.8c0,0-0.2-0.1-0.2-0.1\n\t\t\tC43.4,457.8-6.9,376.1-6.9,282.7c0-140.6,114-254.5,254.5-254.5H505\"/>\n\t\t<path style=\"opacity:0.2308;fill:none;stroke:#00C0F3;stroke-miterlimit:10;\" d=\"M119.5,504.2l-1.5-0.8c0,0-0.2-0.1-0.2-0.1\n\t\t\tc-75.4-44.5-126-126.6-126-220.5c0-141.3,114.6-255.9,255.9-255.9H505\"/>\n\t\t<path style=\"opacity:0.2115;fill:none;stroke:#00C1F4;stroke-miterlimit:10;\" d=\"M118.8,505.3l-1.6-0.8c0,0-0.2-0.1-0.2-0.1\n\t\t\tC41.3,459.6-9.6,377.1-9.6,282.7c0-142.1,115.2-257.3,257.3-257.3H505\"/>\n\t\t<path style=\"opacity:0.1923;fill:none;stroke:#00C2F5;stroke-miterlimit:10;\" d=\"M118.2,506.5l-1.6-0.9c0,0-0.2-0.1-0.2-0.1\n\t\t\tc-76.2-45-127.3-128-127.3-222.9C-10.9,139.8,104.9,24,247.7,24H505\"/>\n\t\t<path style=\"opacity:0.1731;fill:none;stroke:#00C3F6;stroke-miterlimit:10;\" d=\"M117.5,507.6l-1.6-0.9c0,0-0.2-0.1-0.2-0.1\n\t\t\tc-76.6-45.2-128-128.6-128-224.1c0-143.6,116.4-260,260-260H505\"/>\n\t\t<path style=\"opacity:0.1538;fill:none;stroke:#00C4F7;stroke-miterlimit:10;\" d=\"M116.8,508.8l-1.6-0.9c0,0-0.2-0.1-0.2-0.1\n\t\t\tC38,462.4-13.6,378.5-13.6,282.6c0-144.4,117-261.4,261.4-261.4H505\"/>\n\t\t<path style=\"opacity:0.1346;fill:none;stroke:#00C5F8;stroke-miterlimit:10;\" d=\"M116.2,509.9l-1.6-0.9c0,0-0.2-0.1-0.2-0.1\n\t\t\tC36.9,463.3-15,379-15,282.6c0-145.1,117.6-262.7,262.7-262.7H505\"/>\n\t\t<path style=\"opacity:0.1154;fill:none;stroke:#00C6F9;stroke-miterlimit:10;\" d=\"M115.5,511.1l-1.6-0.9c0,0-0.2-0.1-0.2-0.1\n\t\t\tc-77.8-45.9-130-130.7-130-227.6c0-145.9,118.2-264.1,264.1-264.1H505\"/>\n\t\t<path style=\"opacity:9.615385e-002;fill:none;stroke:#00C7FA;stroke-miterlimit:10;\" d=\"M114.9,512.3l-1.7-0.9\n\t\t\tc0,0-0.2-0.1-0.2-0.1C34.8,465.1-17.7,379.9-17.7,282.5C-17.7,135.9,101.2,17,247.8,17H505\"/>\n\t\t<path style=\"opacity:7.692308e-002;fill:none;stroke:#00C8FB;stroke-miterlimit:10;\" d=\"M114.2,513.4l-1.7-0.9\n\t\t\tc0,0-0.2-0.1-0.2-0.1c-78.6-46.4-131.4-132-131.4-230c0-147.4,119.5-266.9,266.9-266.9H505\"/>\n\t\t<path style=\"opacity:5.769231e-002;fill:none;stroke:#00C9FC;stroke-miterlimit:10;\" d=\"M113.5,514.6l-1.7-0.9\n\t\t\tc0,0-0.2-0.1-0.2-0.1c-79-46.7-132.1-132.7-132.1-231.1c0-148.1,120.1-268.2,268.2-268.2H505\"/>\n\t\t<path style=\"opacity:3.846154e-002;fill:none;stroke:#00CAFD;stroke-miterlimit:10;\" d=\"M112.9,515.7l-1.7-0.9\n\t\t\tc0,0-0.2-0.1-0.2-0.1C31.5,467.8-21.8,381.3-21.8,282.4c0-148.9,120.7-269.6,269.6-269.6H505\"/>\n\t\t<path style=\"opacity:1.923077e-002;fill:none;stroke:#00CBFE;stroke-miterlimit:10;\" d=\"M112.2,516.9l-1.7-0.9\n\t\t\tc0,0-0.2-0.1-0.2-0.1C30.4,468.7-23.1,381.8-23.1,282.4c0-149.6,121.3-271,271-271H505\"/>\n\t\t<path id=\"glow-to_1_\" style=\"opacity:0;fill:none;stroke:#00CCFF;stroke-miterlimit:10;\" d=\"M111.6,518.1l-1.9-1\n\t\t\tC29.4,469.7-24.5,382.3-24.5,282.3C-24.5,131.9,97.4,10,247.9,10H505\"/>\n\t</g>\n\t<g id=\"bar_2_\">\n\t\t<g>\n\t\t\t<path style=\"fill:none;stroke:#0099CC;stroke-width:20;stroke-miterlimit:10;\" d=\"M146,457.7c-59.3-35-100.1-99.9-100.1-173.7\n\t\t\t\tc0-111,90-201.1,201.1-201.1h258\"/>\n\t\t</g>\n\t\t<defs>\n\t\t\t<filter id=\"Adobe_OpacityMaskFilter\" filterUnits=\"userSpaceOnUse\" x=\"35.9\" y=\"72.9\" width=\"469.1\" height=\"393.4\">\n\t\t\t\t\n\t\t\t\t\t<feColorMatrix  type=\"matrix\" values=\"-1 0 0 0 1  0 -1 0 0 1  0 0 -1 0 1  0 0 0 1 0\" color-interpolation-filters=\"sRGB\" result=\"source\"/>\n\t\t\t</filter>\n\t\t</defs>\n\t\t<mask maskUnits=\"userSpaceOnUse\" x=\"35.9\" y=\"72.9\" width=\"469.1\" height=\"393.4\" id=\"SVGID_1_\">\n\t\t\t<g style=\"filter:url(#Adobe_OpacityMaskFilter);\">\n\t\t\t\t\n\t\t\t\t\t<image style=\"overflow:visible;\" width=\"474\" height=\"398\" xlink:href=\"data:image/jpeg;base64,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\nfWtDjxb6p90XS0/7ov8A2q/51//Z\" transform=\"matrix(1 0 0 1 33.5 70.5)\">\n\t\t\t\t</image>\n\t\t\t</g>\n\t\t</mask>\n\t\t<g style=\"opacity:0.85;mask:url(#SVGID_1_);\">\n\t\t\t<path style=\"fill:none;stroke:#CCFFFF;stroke-width:20;stroke-miterlimit:10;\" d=\"M146,457.7c-59.3-35-100.1-99.9-100.1-173.7\n\t\t\t\tc0-111,90-201.1,201.1-201.1h258\"/>\n\t\t</g>\n\t</g>\n</g>\n<g id=\"marker\">\n\t<polygon style=\"fill:#CC6600;\" points=\"71,-10 66.5,0 71,10 46,0 \t\"/>\n\t\n\t\t<text id=\"marker-text\" transform=\"matrix(0 -1.4607 1 0 63 -15.5)\" style=\"fill:#FFFFFF;stroke:#FFFFFF;stroke-miterlimit:10; font-family:'Calibri'; font-size:14;\">123</text>\n\t\n\t\t<text id=\"marker-text-mirror\" transform=\"matrix(0 1.4607 1 0 63 18.5)\" style=\"display:none;fill:#FFFFFF;stroke:#FFFFFF;stroke-miterlimit:10; font-family:'Calibri'; font-size:14;\">123</text>\n</g>\n<g id=\"clip-path\">\n\t<path id=\"_x3C_Path_x3E__2_\" style=\"fill:none;stroke:#FFFFFF;stroke-width:90;stroke-miterlimit:10;\" d=\"M133,480.5\n\t\tC64.9,441.1,19,367.4,19,283C19,157.1,121.1,55,247,55h258\"/>\n</g>\n<g id=\"clip-path-bi\">\n\t<path id=\"neg-path\" style=\"fill:none;stroke:#FFFFFF;stroke-width:90;stroke-miterlimit:10;\" d=\"M19,283\n\t\tc0,84.4,45.9,158.1,114,197.5\"/>\n\t<path id=\"pos-path\" style=\"fill:none;stroke:#FFFFFF;stroke-width:90;stroke-miterlimit:10;\" d=\"M19,283C19,157.1,121.1,55,247,55\n\t\th258\"/>\n</g>\n</svg>\n"
 
 /***/ },
 /* 402 */
@@ -37496,7 +37609,7 @@
 /***/ function(module, exports) {
 
 	/*
-		Main config - set layout, model and data parameters for ui components 
+		Main config - set layout, model and data parameters for ui components
 	*/
 	module.exports = {
 
@@ -37504,9 +37617,9 @@
 
 		layout: 'SubMission', // EasySlider | SubMission
 
-		model: 'Vesc', // Vesc | Mobipus
+		model: 'vesc', // Vesc | Mobipus
 
-		fps: 30, 
+		fps: 30,
 
 	 	// available layouts
 
@@ -37522,8 +37635,8 @@
 			battery_voltage: {
 				title: 'Battery',
 				units: 'V',
-				min: 12.0,
-				max: 16.8,
+				min: 25.6,
+				max: 34.4,
 				step: 0.5,
 				precision: 1
 			},
@@ -37531,25 +37644,25 @@
 			battery_current: {
 				title: 'Current',
 				units: 'A',
-				min: -80,
-				max: 200,
-				step: 20,
+				min: -50,
+				max: 130,
+				step: 10,
 				precision: 0
 			},
 
-	        power_kw: {
-	        	title: 'Power', 
-	            units: 'KW',
-	            min: -4.0, 
-	            max: 10.0,
-	            step: 1.0,
-	            precision: 1
-	        },
+	    power_kw: {
+	    	title: 'Power',
+	        units: 'KW',
+	        min: -4.0,
+	        max: 10.0,
+	        step: 1.0,
+	        precision: 1
+	    },
 
 			power_w: {
-	        	title: 'Power', 
+	        	title: 'Power',
 	            units: 'W',
-	            min: -5000, 
+	            min: -5000,
 	            max: 10000,
 	            step: 100,
 	            precision: 0
@@ -37559,8 +37672,8 @@
 				title: 'Speed',
 				units: 'KPH',
 				min: 0,
-				max: 260,
-				step: 20,
+				max: 60,
+				step: 10,
 				precision: 0
 			},
 
@@ -37568,8 +37681,8 @@
 				title: 'Speed',
 				units: 'MPH',
 				min: 0,
-				max: 160,
-				step: 20,
+				max: 40,
+				step: 5,
 				precision: 0
 			},
 
@@ -37577,8 +37690,8 @@
 				title: 'Distance',
 				units: 'KM',
 				min: 0,
-				max: 200,
-				step: 20,
+				max: 30,
+				step: 2,
 				precision: 1
 			},
 
@@ -37586,8 +37699,8 @@
 				title: 'Distance',
 				units: 'Miles',
 				min: 0,
-				max: 200,
-				step: 20,
+				max: 20,
+				step: 2,
 				precision: 1
 			},
 
@@ -37622,8 +37735,8 @@
 				title: 'Phase',
 				units: 'A',
 				min: 0,
-				max: 200,
-				step: 40,
+				max: 130,
+				step: 20,
 				precision: 0
 			},
 
@@ -37688,20 +37801,21 @@
 			wheel_circumference_mm: {
 				title: 'Wheel Circumference',
 				units: 'mm',
-				value: 1250,
+				value: 970,
 				precision: 0
 			}
 		}
 	}
+
 
 /***/ },
 /* 407 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var map = {
-		"./Mobipus/Mobipus.js": 408,
-		"./ProtoDrive.js": 409,
-		"./Vesc/Vesc.js": 410
+		"./ProtoDrive.js": 408,
+		"./mobipus/mobipus.js": 409,
+		"./vesc/vesc.js": 410
 	};
 	function webpackContext(req) {
 		return __webpack_require__(webpackContextResolve(req));
@@ -37719,12 +37833,6 @@
 
 /***/ },
 /* 408 */
-/***/ function(module, exports) {
-
-	
-
-/***/ },
-/* 409 */
 /***/ function(module, exports) {
 
 	module.exports = function() {
@@ -37805,10 +37913,16 @@
 
 
 /***/ },
+/* 409 */
+/***/ function(module, exports) {
+
+	
+
+/***/ },
 /* 410 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var ProtoDrive = __webpack_require__(409);
+	var ProtoDrive = __webpack_require__(408);
 
 	module.exports = new function() {
 
